@@ -238,7 +238,8 @@ export default function PrivacyPolicyPage() {
         <p className="mb-3">
           The mobile app does not use browser cookies. We store your
           authentication session on your device using local storage (AsyncStorage)
-          so you stay signed in.
+          so you stay signed in. We do not sell your personal information or use
+          your data for third‑party advertising or cross‑app tracking.
         </p>
       </section>
 
@@ -274,6 +275,33 @@ export default function PrivacyPolicyPage() {
           collected from children under age 13, please contact us using the
           contact information provided below.
         </p>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold mb-3">Data Retention and Deletion</h2>
+        <ul className="list-disc pl-6 space-y-1">
+          <li>
+            <strong>Content you upload</strong> (photos, videos, captions, comments)
+            is kept until you delete it or delete your account.
+          </li>
+          <li>
+            <strong>Push notification tokens</strong> are stored while
+            notifications are enabled to deliver notifications. If you disable
+            notifications or sign out, we stop using your token. You can request
+            removal at any time using the contact information below.
+          </li>
+          <li>
+            <strong>Backups and logs</strong> may retain limited data for a
+            short period for security, backup, and troubleshooting purposes
+            before automatic deletion.
+          </li>
+          <li>
+            <strong>Account deletion</strong>: You will be able to delete your
+            account from Settings. After deletion, your profile and content are
+            removed from our active systems; residual copies may persist in
+            backups for a limited time.
+          </li>
+        </ul>
       </section>
 
 
