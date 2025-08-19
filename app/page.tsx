@@ -1,361 +1,446 @@
-import type { Metadata } from "next";
-import Image from "next/image";
+'use client'
 
-export const metadata: Metadata = {
-  title: "Privacy Policy - Biteclub",
-  description:
-    "Learn how Biteclub collects, uses, and protects your information when you use our app.",
-};
+import { useState, useEffect } from 'react'
+import { ChevronDown, Users, BookOpen, Camera, TrendingUp, Heart, MessageCircle, Star, ArrowRight, Check, Menu, X, Sparkles, Zap } from 'lucide-react'
 
-export default function PrivacyPolicyPage() {
+export default function Page() {
+  const [scrollY, setScrollY] = useState(0)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const features = [
+    {
+      icon: <Camera className="w-6 h-6" />,
+      title: "Log Every Meal",
+      description: "Snap photos, add notes, and build your personal cookbook of wins"
+    },
+    {
+      icon: <Users className="w-6 h-6" />,
+      title: "Follow Friends' Kitchens",
+      description: "See what your crew is cooking in real-time, just like following workouts"
+    },
+    {
+      icon: <BookOpen className="w-6 h-6" />,
+      title: "Save & Share Recipes",
+      description: "Import from anywhere or create your own - never lose a recipe again"
+    },
+    {
+      icon: <TrendingUp className="w-6 h-6" />,
+      title: "Track Your Journey",
+      description: "Watch your cooking skills evolve with every meal you log"
+    },
+    {
+      icon: <Heart className="w-6 h-6" />,
+      title: "Celebrate Together",
+      description: "Give kudos, swap tips, and keep the kitchen conversation alive"
+    },
+    {
+      icon: <Star className="w-6 h-6" />,
+      title: "Set Cooking Goals",
+      description: "Challenge yourself to try new cuisines, techniques, or ingredients"
+    }
+  ]
+
+  const earlyAccessPerks = [
+    "Claim your unique username",
+    "Shape the future of BiteClub",
+    "Exclusive founding member badge",
+    "Priority access to new features",
+    "Join the first 1,000 members"
+  ]
+
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10">
-      <header className="mb-8 flex items-center gap-4">
-        <Image src="/icon.png" alt="Biteclub icon" width={56} height={56} />
-        <div>
-          <h1 className="text-2xl font-semibold">Privacy Policy for Biteclub</h1>
-          <p className="text-sm opacity-70">Last Updated: August 8, 2025</p>
+    <div className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-white to-pink-50" />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-orange-200/30 rounded-full blur-[128px] animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-pink-200/30 rounded-full blur-[128px] animate-pulse animation-delay-2000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-yellow-100/20 rounded-full blur-[200px]" />
+      </div>
+
+      {/* Navigation */}
+      <nav className="relative z-50 px-6 py-6 lg:px-12 bg-white/80 backdrop-blur-md sticky top-0 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-pink-600 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-lg">
+              B
+            </div>
+            <span className="text-xl font-bold text-gray-900">BiteClub</span>
+            <span className="hidden sm:inline-flex items-center px-2 py-1 bg-gradient-to-r from-orange-500 to-pink-600 text-white text-xs font-semibold rounded-full ml-2">
+              <Sparkles className="w-3 h-3 mr-1" />
+              LAUNCHING SOON
+            </span>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-8">
+            <a href="#features" className="text-gray-600 hover:text-orange-600 transition-colors">Features</a>
+            <a href="#how" className="text-gray-600 hover:text-orange-600 transition-colors">How it Works</a>
+            <a href="#early-access" className="text-gray-600 hover:text-orange-600 transition-colors">Early Access</a>
+            <button className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold hover:shadow-xl hover:shadow-orange-200 transition-all transform hover:scale-105">
+              Join Waitlist
+            </button>
+          </div>
+
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden text-gray-700"
+          >
+            {mobileMenuOpen ? <X /> : <Menu />}
+          </button>
         </div>
-      </header>
 
-      <p className="mb-4">
-        Welcome to Biteclub! This Privacy Policy explains how we collect, use,
-        disclose, and safeguard your information when you use our mobile
-        application (the "App"). Please read this privacy policy carefully. If
-        you do not agree with the terms of this privacy policy, please do not
-        access the application.
-      </p>
-      <p className="mb-8">
-        We reserve the right to make changes to this Privacy Policy at any time
-        and for any reason. We will alert you about any changes by updating the
-        "Last Updated" date of this Privacy Policy. You are encouraged to
-        periodically review this Privacy Policy to stay informed of updates.
-      </p>
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg p-6 space-y-4 border-b border-gray-100 shadow-xl">
+            <a href="#features" className="block py-2 text-gray-600 hover:text-orange-600 transition-colors">Features</a>
+            <a href="#how" className="block py-2 text-gray-600 hover:text-orange-600 transition-colors">How it Works</a>
+            <a href="#early-access" className="block py-2 text-gray-600 hover:text-orange-600 transition-colors">Early Access</a>
+            <button className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold">
+              Join Waitlist
+            </button>
+          </div>
+        )}
+      </nav>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">Collection of Your Information</h2>
-        <p className="mb-3">
-          We may collect information about you in a variety of ways. The
-          information we may collect via the App includes:
-        </p>
+      {/* Hero Section */}
+      <section className="relative z-10 px-6 py-20 lg:py-32 lg:px-12">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-orange-100 to-pink-100 rounded-full mb-8 border border-orange-200">
+            <Zap className="w-4 h-4 text-orange-600" />
+            <span className="text-sm font-semibold text-gray-700">The Brand New Social Network for Home Cooks</span>
+          </div>
+          
+          <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+            <span className="text-gray-900">See What Your Friends</span>
+            <br />
+            <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+              Are Cooking Tonight
+            </span>
+          </h1>
+          
+          <p className="text-xl lg:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
+            BiteClub is the Strava for cooking. Share your meals, discover amazing recipes, and turn every dish into a social experience. Join the kitchen revolution.
+          </p>
 
-        <h3 className="font-semibold mb-1">Personal Data</h3>
-        <p className="mb-3">
-          Information you provide, such as your name, username, profile photo,
-          and phone number (required for SMS sign‑in). You may optionally provide
-          an email address if you use email/password sign‑in. You also provide
-          content you upload (for example, photos, videos, captions, comments).
-          We do not request age, gender, or other demographic data.
-        </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+            <button className="group px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-2xl hover:shadow-orange-200 transition-all transform hover:scale-105 flex items-center justify-center">
+              Get Early Access
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button className="px-8 py-4 bg-gray-100 text-gray-700 rounded-full font-semibold text-lg hover:bg-gray-200 transition-all border border-gray-200">
+              Watch Demo
+            </button>
+          </div>
 
-        <h3 className="font-semibold mb-1">Derivative Data</h3>
-        <p className="mb-3">
-          Information our servers automatically collect when you access the App,
-          such as your native actions that are integral to the App, including
-          liking, commenting, or replying to a post, as well as other
-          interactions with the App and other users via server log files.
-        </p>
+          {/* Launch Countdown */}
+          <div className="inline-flex items-center space-x-6 px-6 py-4 bg-white rounded-2xl shadow-xl border border-gray-100">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-orange-600">127</div>
+              <div className="text-xs text-gray-500 uppercase">Spots Left</div>
+            </div>
+            <div className="w-px h-12 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-pink-600">873</div>
+              <div className="text-xs text-gray-500 uppercase">On Waitlist</div>
+            </div>
+            <div className="w-px h-12 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">Jan '25</div>
+              <div className="text-xs text-gray-500 uppercase">Launch Date</div>
+            </div>
+          </div>
 
-        <h3 className="font-semibold mb-1">Financial Data</h3>
-        <p className="mb-3">We do not collect any financial information.</p>
-
-        <h3 className="font-semibold mb-1">Mobile Device Access</h3>
-        <p className="mb-3">
-          We may request access or permission to certain features from your
-          mobile device, including your mobile device's camera, contacts, and
-          storage. If you wish to change our access or permissions, you may do
-          so in your device's settings.
-        </p>
-
-        <h3 className="font-semibold mb-1">Mobile Device Data</h3>
-        <p className="mb-3">
-          If you sign in, we store your phone number with your profile. When you
-          enable notifications, we store a push token and your device type (iOS
-          or Android) to deliver notifications. We do not collect precise
-          location data.
-        </p>
-
-        <h3 className="font-semibold mb-1">Push Notifications</h3>
-        <p className="mb-3">
-          We request permission to send you push notifications related to your
-          account and app activity (for example, meal reminders). Some
-          categories may be enabled by default after you grant permission. You
-          can change these preferences in Settings at any time or disable
-          notifications in your device settings.
-        </p>
-
-        <h3 className="font-semibold mb-1">Contacts Matching (optional)</h3>
-        <p>
-          If you choose to find friends, we will request access to your address
-          book and upload phone numbers to our servers solely to check which of
-          your contacts use Biteclub. We do not store your address book; the
-          numbers are used for one-time matching and then discarded.
-        </p>
+          <div className="animate-bounce mt-12">
+            <ChevronDown className="w-8 h-8 mx-auto text-gray-400" />
+          </div>
+        </div>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">Use of Your Information</h2>
-        <p className="mb-3">
-          Having accurate information about you permits us to provide you with a
-          smooth, efficient, and customized experience. Specifically, we may use
-          information collected about you via the App to:
-        </p>
-        <ol className="list-decimal pl-6 space-y-1">
-          <li>Create and manage your account.</li>
-          <li>Contact you about your account or service updates.</li>
-          <li>Enable user-to-user communications.</li>
-          <li>
-            Generate a personal profile about you to make future visits to the
-            App more personalized.
-          </li>
-          <li>Increase the efficiency and operation of the App.</li>
-          <li>
-            Monitor and analyze usage and trends to improve your experience with
-            the App.
-          </li>
-          <li>Notify you of updates to the App.</li>
-          <li>Offer new features and recommendations to you.</li>
-          <li>Perform other service-related operations as needed.</li>
-          <li>
-            Prevent fraudulent transactions, monitor against theft, and protect
-            against criminal activity.
-          </li>
-          <li>Request feedback and contact you about your use of the App.</li>
-          <li>Resolve disputes and troubleshoot problems.</li>
-          <li>Respond to product and customer service requests.</li>
-          <li>Solicit support for the App.</li>
-        </ol>
+      {/* What Makes Us Different */}
+      <section className="relative z-10 py-20 bg-gradient-to-b from-orange-50/50 to-pink-50/50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="text-center mb-12">
+            <span className="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-700 text-sm font-semibold rounded-full mb-4">
+              <Sparkles className="w-3 h-3 mr-1" />
+              Why BiteClub
+            </span>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
+              Finally, a social network that celebrates
+              <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent"> real cooking</span>
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="text-center p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+              <div className="text-4xl mb-3">🍳</div>
+              <h3 className="font-semibold text-gray-900 mb-2">Not Just Pretty Pictures</h3>
+              <p className="text-gray-600 text-sm">Track your cooking journey with real stats, streaks, and achievements</p>
+            </div>
+            <div className="text-center p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+              <div className="text-4xl mb-3">👥</div>
+              <h3 className="font-semibold text-gray-900 mb-2">Your Real Friends</h3>
+              <p className="text-gray-600 text-sm">See what your actual friends are cooking, not influencers or ads</p>
+            </div>
+            <div className="text-center p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+              <div className="text-4xl mb-3">📱</div>
+              <h3 className="font-semibold text-gray-900 mb-2">Built for Home Cooks</h3>
+              <p className="text-gray-600 text-sm">Quick logging, smart recipe import, and features that actually help</p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">Disclosure of Your Information</h2>
-        <h3 className="font-semibold mb-1">By Law or to Protect Rights</h3>
-        <p className="mb-3">
-          If we believe the release of information about you is necessary to
-          respond to legal process, to investigate or remedy potential
-          violations of our policies, or to protect the rights, property, and
-          safety of others, we may share your information as permitted or
-          required by any applicable law, rule, or regulation.
-        </p>
+      {/* Features Grid */}
+      <section id="features" className="relative z-10 py-20 lg:py-32 px-6 lg:px-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-gray-900">
+              Everything you need to make
+              <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent"> cooking social</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              We're building the features home cooks actually want. No fluff, just the good stuff.
+            </p>
+          </div>
 
-        <h3 className="font-semibold mb-1">Third-Party Service Providers</h3>
-        <p className="mb-3">
-          We may share your information with third parties that perform services
-          for us or on our behalf, including payment processing, data analysis,
-          email delivery, hosting services, customer service, and marketing
-          assistance.
-        </p>
-        <ul className="list-disc pl-6 mb-3 space-y-1">
-          <li>
-            <strong>Supabase:</strong> We use Supabase for our backend, database,
-            and authentication. You can review their privacy policy {" "}
-            <a
-              href="https://supabase.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-              className="underline"
-            >
-              here
-            </a>
-            .
-          </li>
-          <li>
-            <strong>Cloudflare (Images & Stream):</strong> We host user-uploaded
-            photos and videos with Cloudflare. See Cloudflare's privacy policy {" "}
-            <a
-              href="https://www.cloudflare.com/privacypolicy/"
-            target="_blank"
-            rel="noopener noreferrer"
-              className="underline"
-            >
-              here
-            </a>
-            .
-          </li>
-          <li>
-            <strong>Expo Notifications:</strong> We use Expo's push notification
-            service to deliver notifications. Their privacy policy is available {" "}
-            <a
-              href="https://expo.dev/privacy"
-          target="_blank"
-          rel="noopener noreferrer"
-              className="underline"
-            >
-              here
-            </a>
-            .
-          </li>
-          <li>
-            <strong>Sentry (error reporting):</strong> Our media API uses Sentry
-            to capture errors. Limited context (such as your user ID) may be
-            sent to diagnose issues. See Sentry's privacy policy {" "}
-            <a
-              href="https://sentry.io/privacy/"
-          target="_blank"
-          rel="noopener noreferrer"
-              className="underline"
-            >
-              here
-            </a>
-            .
-          </li>
-        </ul>
-
-        <h3 className="font-semibold mb-1">Interactions with Other Users</h3>
-        <p className="mb-3">
-          If you interact with other users of the App, those users may see your
-          name, profile photo, and descriptions of your activity, including
-          posting content, commenting, liking, or following.
-        </p>
-
-        <h3 className="font-semibold mb-1">Online Postings</h3>
-        <p className="mb-3">
-          When you post comments, contributions or other content to the App,
-          your posts may be viewed by all users and may be publicly distributed
-          outside the App in perpetuity.
-        </p>
-
-        <h3 className="font-semibold mb-1">Affiliates</h3>
-        <p className="mb-3">
-          We may share your information with our affiliates, in which case we
-          will require those affiliates to honor this Privacy Policy. Affiliates
-          include our parent company and any subsidiaries, joint venture
-          partners or other companies that we control or that are under common
-          control with us.
-        </p>
-
-        <h3 className="font-semibold mb-1">Business Partners</h3>
-        <p>
-          We may share your information with our business partners to offer you
-          certain products, services or promotions.
-        </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, i) => (
+              <div 
+                key={i}
+                className="group p-8 rounded-2xl bg-white shadow-lg hover:shadow-2xl border border-gray-100 transition-all hover:-translate-y-1"
+                style={{ animationDelay: `${i * 100}ms` }}
+              >
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-white shadow-lg">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-gray-900">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">App Storage and Tracking</h2>
+      {/* How It Works */}
+      <section id="how" className="relative z-10 py-20 lg:py-32 px-6 lg:px-12 bg-gradient-to-b from-white via-purple-50/30 to-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-gray-900">
+              As Easy as
+              <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent"> Cook, Snap, Share</span>
+            </h2>
+          </div>
 
-        <h3 className="font-semibold mb-1">Local Storage</h3>
-        <p className="mb-3">
-          The mobile app does not use browser cookies. We store your
-          authentication session on your device using local storage (AsyncStorage)
-          so you stay signed in. We do not sell your personal information or use
-          your data for third‑party advertising or cross‑app tracking.
-        </p>
+          <div className="grid lg:grid-cols-3 gap-12">
+            <div className="text-center group">
+              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-orange-100 to-pink-100 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                  1
+                </div>
+              </div>
+              <h3 className="text-2xl font-semibold mb-3 text-gray-900">Cook Something Amazing</h3>
+              <p className="text-gray-600">Whether it's your grandma's recipe or a wild experiment, every meal counts</p>
+            </div>
+
+            <div className="text-center group">
+              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-orange-100 to-pink-100 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                  2
+                </div>
+              </div>
+              <h3 className="text-2xl font-semibold mb-3 text-gray-900">Share with Your Crew</h3>
+              <p className="text-gray-600">Post photos, add details, and let your friends see what you're plating up</p>
+            </div>
+
+            <div className="text-center group">
+              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-orange-100 to-pink-100 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                  3
+                </div>
+              </div>
+              <h3 className="text-2xl font-semibold mb-3 text-gray-900">Get Inspired Daily</h3>
+              <p className="text-gray-600">Discover new dishes, save recipes, and turn your feed into your cookbook</p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">Third-Party Websites</h2>
-        <p>
-          The App may contain links to third-party websites and applications of
-          interest, including advertisements and external services, that are not
-          affiliated with us. Once you have used these links to leave the App,
-          any information you provide to these third parties is not covered by
-          this Privacy Policy, and we cannot guarantee the safety and privacy of
-          your information.
-        </p>
+      {/* Early Access Section */}
+      <section id="early-access" className="relative z-10 py-20 lg:py-32 px-6 lg:px-12 bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span className="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-700 text-sm font-semibold rounded-full mb-6">
+                <Zap className="w-3 h-3 mr-1" />
+                LIMITED EARLY ACCESS
+              </span>
+              <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+                Be Part of the
+                <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent"> Founding Community</span>
+              </h2>
+              <p className="text-xl text-gray-700 mb-8">
+                Join the first 1,000 members shaping the future of social cooking. Get exclusive perks and help us build the platform home cooks deserve.
+              </p>
+              
+              <div className="space-y-4 mb-8">
+                {earlyAccessPerks.map((item, i) => (
+                  <div key={i} className="flex items-center space-x-3">
+                    <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-pink-600 rounded-full flex items-center justify-center shadow-md">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-gray-700">{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="group px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-2xl hover:shadow-orange-200 transition-all transform hover:scale-105 flex items-center justify-center">
+                  Claim Your Spot
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button className="px-8 py-4 bg-white text-gray-700 rounded-full font-semibold text-lg hover:bg-gray-50 transition-all border border-gray-200">
+                  Learn More
+                </button>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="aspect-square bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
+                <div className="h-full bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl flex items-center justify-center border border-orange-100">
+                  <div className="text-center p-8">
+                    <div className="text-6xl mb-4">🚀</div>
+                    <p className="text-2xl font-bold text-gray-900 mb-2">Launching January 2025</p>
+                    <p className="text-gray-600 mb-6">Be first to experience the future of social cooking</p>
+                    <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
+                      127 spots remaining
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Floating UI Elements */}
+              <div className="absolute -top-4 -right-4 px-4 py-2 bg-white rounded-full text-sm font-semibold shadow-xl border border-gray-100 animate-bounce">
+                <Heart className="inline w-4 h-4 mr-1 text-red-500" /> 42 kudos
+              </div>
+              <div className="absolute -bottom-4 -left-4 px-4 py-2 bg-white rounded-full text-sm font-semibold shadow-xl border border-gray-100 animate-bounce animation-delay-1000">
+                <MessageCircle className="inline w-4 h-4 mr-1 text-blue-500" /> "Looks amazing!"
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">Security of Your Information</h2>
-        <p>
-          We use administrative, technical, and physical security measures to
-          help protect your personal information. While we have taken reasonable
-          steps to secure the personal information you provide to us, please be
-          aware that despite our efforts, no security measures are perfect or
-          impenetrable, and no method of data transmission can be guaranteed
-          against any interception or other type of misuse.
-        </p>
+      {/* Testimonials/Vision */}
+      <section className="relative z-10 py-20 lg:py-32 px-6 lg:px-12">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+            We're Building Something
+            <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent"> Special</span>
+          </h2>
+          <p className="text-xl text-gray-600 mb-12">
+            BiteClub isn't just another app. It's a movement to bring people together through food, celebrate home cooking, and make every meal a shared experience. 
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+              <div className="text-3xl mb-3">🌍</div>
+              <h3 className="font-semibold text-gray-900 mb-2">Global Kitchen</h3>
+              <p className="text-gray-600 text-sm">Connect with home cooks worldwide and discover authentic recipes from every culture</p>
+            </div>
+            <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+              <div className="text-3xl mb-3">💪</div>
+              <h3 className="font-semibold text-gray-900 mb-2">Level Up Together</h3>
+              <p className="text-gray-600 text-sm">Track progress, earn achievements, and motivate each other to try new things</p>
+            </div>
+            <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+              <div className="text-3xl mb-3">❤️</div>
+              <h3 className="font-semibold text-gray-900 mb-2">Real Connections</h3>
+              <p className="text-gray-600 text-sm">Bond over shared meals, family recipes, and the universal language of good food</p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">Policy for Children</h2>
-        <p>
-          We do not knowingly solicit information from or market to children
-          under the age of 13. If you become aware of any data we have
-          collected from children under age 13, please contact us using the
-          contact information provided below.
-        </p>
+      {/* Final CTA */}
+      <section className="relative z-10 py-20 lg:py-32 px-6 lg:px-12 bg-gradient-to-br from-orange-600 to-pink-600">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl lg:text-6xl font-bold mb-6 text-white">
+            Ready to Join the Kitchen Revolution?
+          </h2>
+          <p className="text-xl text-white/90 mb-12">
+            Don't miss your chance to be part of BiteClub from day one. Limited spots available.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="group px-8 py-4 bg-white text-gray-900 rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-black/20 transition-all transform hover:scale-105 flex items-center justify-center">
+              Get Early Access Now
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-lg hover:bg-white/30 transition-all border-2 border-white/50">
+              Follow Our Journey
+            </button>
+          </div>
+          
+          <p className="text-white/80 text-sm mt-8">
+            🔥 873 people on the waitlist • 127 early access spots left
+          </p>
+        </div>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">Data Retention and Deletion</h2>
-        <ul className="list-disc pl-6 space-y-1">
-          <li>
-            <strong>Content you upload</strong> (photos, videos, captions, comments)
-            is kept until you delete it or delete your account.
-          </li>
-          <li>
-            <strong>Push notification tokens</strong> are stored while
-            notifications are enabled to deliver notifications. If you disable
-            notifications or sign out, we stop using your token. You can request
-            removal at any time using the contact information below.
-          </li>
-          <li>
-            <strong>Backups and logs</strong> may retain limited data for a
-            short period for security, backup, and troubleshooting purposes
-            before automatic deletion.
-          </li>
-          <li>
-            <strong>Account deletion</strong>: You will be able to delete your
-            account from Settings. After deletion, your profile and content are
-            removed from our active systems; residual copies may persist in
-            backups for a limited time.
-          </li>
-        </ul>
-      </section>
-
-
-      <section>
-        <h2 className="text-xl font-semibold mb-3">
-          Options Regarding Your Information
-        </h2>
-
-        <h3 className="font-semibold mb-1">Account Information</h3>
-        <p className="mb-3">
-          You may at any time review or change the information in your account
-          or terminate your account by:
-        </p>
-        <ul className="list-disc pl-6 mb-3 space-y-1">
-          <li>Logging into your account settings and updating your account</li>
-          <li>Contacting us using the contact information provided below</li>
-        </ul>
-        <p className="mb-3">
-          Upon your request to terminate your account, we will deactivate or
-          delete your account and information from our active databases. However,
-          some information may be retained in our files to prevent fraud,
-          troubleshoot problems, assist with any investigations, enforce our
-          Terms of Use and/or comply with legal requirements.
-        </p>
-
-        <h3 className="font-semibold mb-1">Emails and Communications</h3>
-        <p className="mb-3">
-          If you no longer wish to receive correspondence, emails, or other
-          communications from us, you may opt-out by:
-        </p>
-        <ul className="list-disc pl-6 space-y-1">
-          <li>
-            Noting your preferences at the time you register your account with
-            the App
-          </li>
-          <li>Logging into your account settings and updating your preferences.</li>
-          <li>Contacting us using the contact information provided below</li>
-        </ul>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-3">Contact Us</h2>
-        <p className="mb-2">
-          If you have questions or comments about this Privacy Policy, please
-          contact us at:
-        </p>
-        <address className="not-italic leading-6">
-          Biteclub
-          <br />
-          wejarrard@gmail.com
-          <br />
-          +1 (608) 772-8104
-        </address>
-      </section>
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-gray-200 px-6 py-12 lg:px-12 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-pink-600 rounded-lg flex items-center justify-center font-bold text-white shadow-md">
+                  B
+                </div>
+                <span className="font-bold text-gray-900">BiteClub</span>
+              </div>
+              <p className="text-gray-600 text-sm">The social network for home cooks. Launching January 2025.</p>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4 text-gray-900">Product</h4>
+              <div className="space-y-2 text-gray-600 text-sm">
+                <p>Features</p>
+                <p>Roadmap</p>
+                <p>FAQ</p>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4 text-gray-900">Company</h4>
+              <div className="space-y-2 text-gray-600 text-sm">
+                <p>About</p>
+                <p>Blog</p>
+                <p>Press Kit</p>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4 text-gray-900">Connect</h4>
+              <div className="space-y-2 text-gray-600 text-sm">
+                <p>Twitter</p>
+                <p>Instagram</p>
+                <p>Contact</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center text-gray-500 text-sm pt-8 border-t border-gray-200">
+            © 2024 BiteClub. All rights reserved. Made with ❤️ for home cooks everywhere.
+          </div>
+        </div>
+      </footer>
     </div>
-  );
+  )
 }
