@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "WQHKN43K8Z.com.wejarrard.biteclub",
+        "paths": [
+          "/recipe/*",
+          "/meal/*"
+        ]
+      }
+    ]
+  }
+}
+
