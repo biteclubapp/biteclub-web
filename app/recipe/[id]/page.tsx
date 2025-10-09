@@ -72,18 +72,29 @@ function StickyBanner() {
   );
 }
 
-export default function RecipePage({ params }: { params: { id: string } }) {
+export default function RecipePage({ params }: { params: Promise<{ id: string }> }) {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recipeId, setRecipeId] = useState<string | null>(null);
 
   useEffect(() => {
+    const unwrapParams = async () => {
+      const { id } = await params;
+      setRecipeId(id);
+    };
+    unwrapParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (!recipeId) return;
+    
     const fetchRecipe = async () => {
-      const data = await getRecipe(params.id);
+      const data = await getRecipe(recipeId);
       setRecipe(data);
       setLoading(false);
     };
     fetchRecipe();
-  }, [params.id]);
+  }, [recipeId]);
 
   if (loading) {
     return (
