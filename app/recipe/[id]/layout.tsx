@@ -1,32 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { Metadata } from 'next';
 
-// Helper to get signed URL for media
-async function getSignedMediaUrl(mediaUri: string): Promise<string | null> {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_MEDIA_API_URL || 'https://biteclub-media-api.biteclub.workers.dev'}/sign-urls`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        urls: [mediaUri],
-      }),
-    });
-
-    if (!response.ok) {
-      console.error('Failed to get signed URL:', response.statusText);
-      return null;
-    }
-
-    const data = await response.json();
-    return data.signedUrls?.[0] || null;
-  } catch (error) {
-    console.error('Error getting signed URL:', error);
-    return null;
-  }
-}
-
 // Helper to create engaging description
 function createDescription(recipe: any): string {
   const authorName = recipe.users?.full_name || recipe.users?.username || 'a home cook';
@@ -102,14 +76,13 @@ export async function generateMetadata({
   const recipeTitle = recipe.title || 'Delicious Recipe';
   const description = createDescription(recipe);
   
-  // Get the first image and sign it if available
-  let imageUrl = 'https://biteclub.fun/icon.png'; // Fallback to logo
+  // Use recipe image if available, otherwise fallback to logo
+  let imageUrl = 'https://biteclub.fun/logo.png';
   
   if (recipe.recipe_media?.[0]?.media_uri) {
-    const signedUrl = await getSignedMediaUrl(recipe.recipe_media[0].media_uri);
-    if (signedUrl) {
-      imageUrl = signedUrl;
-    }
+    // Use the image proxy to serve the recipe image publicly
+    const mediaUri = encodeURIComponent(recipe.recipe_media[0].media_uri);
+    imageUrl = `https://biteclub.fun/api/image-proxy?uri=${mediaUri}`;
   }
 
   const url = `https://biteclub.fun/recipe/${id}`;
