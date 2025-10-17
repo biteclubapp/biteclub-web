@@ -12,7 +12,7 @@ interface Meal {
   created_at: string;
   user_id: string;
   recipe_id?: string;
-  users?: {
+  profiles?: {
     username?: string;
     full_name?: string;
     avatar_url?: string;
@@ -34,12 +34,12 @@ async function getMeal(id: string): Promise<Meal | null> {
     .from('meals')
     .select(`
       *,
-      users!meals_user_id_fkey (
+      profiles!meals_user_id_fkey (
         username,
         full_name,
         avatar_url
       ),
-      recipes!meals_recipe_id_fkey (
+      recipes (
         title,
         description
       ),
@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     };
   }
 
-  const author = meal.users?.username || meal.users?.full_name || 'BiteClub User';
+  const author = meal.profiles?.username || meal.profiles?.full_name || 'BiteClub User';
   const mealTitle = meal.recipes?.title || meal.name || 'Delicious Meal';
   const title = `${mealTitle} | BiteClub`;
   const description = meal.recipes?.description || `Check out this meal from ${author} on BiteClub`;
@@ -127,7 +127,7 @@ export default async function MealPage({ params }: { params: Promise<{ id: strin
     ? `/api/image-proxy?uri=${encodeURIComponent(imageUri)}`
     : null;
 
-  const author = meal.users?.username || meal.users?.full_name || 'BiteClub User';
+  const author = meal.profiles?.username || meal.profiles?.full_name || 'BiteClub User';
   const mealTitle = meal.recipes?.title || meal.name || 'Delicious Meal';
 
   return (
@@ -176,9 +176,9 @@ export default async function MealPage({ params }: { params: Promise<{ id: strin
         {/* Meal Header */}
         <div className="mb-6">
           <div className="flex items-center space-x-3 mb-4">
-            {meal.users?.avatar_url ? (
+            {meal.profiles?.avatar_url ? (
               <img 
-                src={meal.users.avatar_url} 
+                src={meal.profiles.avatar_url} 
                 alt={author}
                 className="w-10 h-10 rounded-full"
               />

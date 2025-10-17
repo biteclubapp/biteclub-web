@@ -14,7 +14,7 @@ async function getRecipe(id: string): Promise<Recipe | null> {
     .from('recipes')
     .select(`
       *,
-      users!recipes_user_id_fkey (
+      profiles!recipes_user_id_fkey (
         username,
         full_name,
         avatar_url
@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     };
   }
 
-  const author = recipe.users?.username || recipe.users?.full_name || 'BiteClub User';
+  const author = recipe.profiles?.username || recipe.profiles?.full_name || 'BiteClub User';
   const title = `${recipe.title} | BiteClub`;
   const description = recipe.description || `Check out this recipe from ${author} on BiteClub`;
   
@@ -103,7 +103,7 @@ export default async function RecipePage({ params }: { params: Promise<{ id: str
     ? `/api/image-proxy?uri=${encodeURIComponent(imageUri)}`
     : null;
 
-  const author = recipe.users?.username || recipe.users?.full_name || 'BiteClub User';
+  const author = recipe.profiles?.username || recipe.profiles?.full_name || 'BiteClub User';
   
   // Debug logging
   console.log('🔍 Recipe data:', {
@@ -160,9 +160,9 @@ export default async function RecipePage({ params }: { params: Promise<{ id: str
         {/* Recipe Header */}
         <div className="mb-6">
           <div className="flex items-center space-x-3 mb-4">
-            {recipe.users?.avatar_url ? (
+            {recipe.profiles?.avatar_url ? (
               <img 
-                src={recipe.users.avatar_url} 
+                src={recipe.profiles.avatar_url} 
                 alt={author}
                 className="w-10 h-10 rounded-full"
               />

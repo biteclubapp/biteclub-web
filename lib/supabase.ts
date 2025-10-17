@@ -20,7 +20,7 @@ export interface Recipe {
   servings?: number;
   created_at: string;
   user_id: string;
-  users?: {
+  profiles?: {
     username?: string;
     full_name?: string;
     avatar_url?: string;
