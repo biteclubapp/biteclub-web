@@ -321,22 +321,31 @@ export default async function RecipePage({ params }: { params: Promise<{ id: str
           )}
 
           {/* Instructions */}
-          {recipe.instructions && Array.isArray(recipe.instructions) && recipe.instructions.length > 0 && (
+          {recipe.instructions && (
             <div className="p-5 bg-gray-50 rounded-xl">
               <h2 className="text-xl font-bold mb-4" style={{ color: '#3D352E' }}>Instructions</h2>
               <ol className="space-y-3">
-                {recipe.instructions.map((instruction: any, index: number) => (
-                  <li key={index} className="flex items-start">
-                    <span className="flex-shrink-0 w-7 h-7 bg-[#c71c39] rounded-full flex items-center justify-center text-white font-semibold text-sm mr-3 mt-0.5">
-                      {index + 1}
-                    </span>
-                    <span className="text-base leading-relaxed pt-0.5" style={{ color: '#3D352E' }}>
-                      {typeof instruction === 'string' 
-                        ? instruction 
-                        : (instruction?.text || String(instruction?.step || ''))}
-                    </span>
-                  </li>
-                ))}
+                {(() => {
+                  // Handle instructions as either string or array
+                  const instructionsList = typeof recipe.instructions === 'string'
+                    ? recipe.instructions.split('\n').filter(line => line.trim())
+                    : Array.isArray(recipe.instructions)
+                    ? recipe.instructions
+                    : [];
+
+                  return instructionsList.map((instruction: any, index: number) => (
+                    <li key={index} className="flex items-start">
+                      <span className="flex-shrink-0 w-7 h-7 bg-[#c71c39] rounded-full flex items-center justify-center text-white font-semibold text-sm mr-3 mt-0.5">
+                        {index + 1}
+                      </span>
+                      <span className="text-base leading-relaxed pt-0.5" style={{ color: '#3D352E' }}>
+                        {typeof instruction === 'string' 
+                          ? instruction 
+                          : (instruction?.text || String(instruction?.step || ''))}
+                      </span>
+                    </li>
+                  ));
+                })()}
               </ol>
             </div>
           )}
