@@ -28,7 +28,7 @@ async function getRecipe(id: string): Promise<Recipe | null> {
     .single();
 
   if (error) {
-    console.error('❌ Supabase error:', error);
+    console.error('❌ Supabase error:', JSON.stringify(error, null, 2));
     return null;
   }
   
@@ -38,6 +38,11 @@ async function getRecipe(id: string): Promise<Recipe | null> {
   }
 
   console.log('✅ Recipe found:', data.title);
+  console.log('📊 Full recipe data:', JSON.stringify(data, null, 2));
+  console.log('🖼️ Recipe media:', data.recipe_media);
+  console.log('📝 Instructions:', data.instructions);
+  console.log('🥗 Ingredients:', data.ingredients_text);
+  
   return data as Recipe;
 }
 
@@ -106,7 +111,14 @@ export default async function RecipePage({ params }: { params: Promise<{ id: str
   const author = recipe.profiles?.username || recipe.profiles?.full_name || 'BiteClub User';
   
   // Debug logging
-  console.log('🔍 Recipe data:', {
+  console.log('🔍 [Render] Recipe ID:', id);
+  console.log('🔍 [Render] Image URL:', imageUrl);
+  console.log('🔍 [Render] Recipe media array:', recipe.recipe_media);
+  console.log('🔍 [Render] Instructions:', recipe.instructions);
+  console.log('🔍 [Render] Instructions type:', typeof recipe.instructions);
+  console.log('🔍 [Render] Instructions is array:', Array.isArray(recipe.instructions));
+  console.log('🔍 [Render] Ingredients:', recipe.ingredients_text);
+  console.log('🔍 [Render] Rendering checks:', {
     hasImage: !!imageUrl,
     hasInstructions: !!(recipe.instructions && Array.isArray(recipe.instructions) && recipe.instructions.length > 0),
     hasIngredients: !!(recipe.ingredients_text && recipe.ingredients_text.length > 0),
