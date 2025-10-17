@@ -2,6 +2,27 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Site config
+NEXT_PUBLIC_BASE_URL=https://biteclub.fun
+
+# Cloudflare Images (for signed URLs)
+NEXT_PUBLIC_CLOUDFLARE_ACCOUNT_HASH=your_account_hash
+CLOUDFLARE_IMAGES_KEY_VALUE=your_signing_key_secret
+```
+
+**Note**: `CLOUDFLARE_IMAGES_KEY_VALUE` is a server-side secret. Get it from: Cloudflare Dashboard → Images → Signed URL Keys.
+
+### Running the Development Server
+
 First, run the development server:
 
 ```bash

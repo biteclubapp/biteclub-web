@@ -10,49 +10,61 @@ When someone shares a BiteClub recipe or meal link (e.g., `https://biteclub.fun/
 
 ```
 Social Media Bot → biteclub.fun → Next.js Server → Supabase (recipe data)
-                                                  → Image Proxy → Media API → Cloudflare Images
+                                                  → Cloudflare Images (signed URLs)
 ```
 
 ### Key Components
 
 1. **Server-Side Rendering** - Recipe and meal pages are server-rendered to generate meta tags
-2. **Image Proxy** - `/api/image-proxy` endpoint fetches private images from Cloudflare and serves them publicly
-3. **Open Graph Metadata** - `generateMetadata()` functions create social media preview tags
+2. **Signed URLs** - Images use time-limited, cryptographically signed URLs (1-hour expiration)
+3. **Open Graph Metadata** - `generateMetadata()` functions create social media preview tags with signed image URLs
 
 ## Privacy & Security
 
-✅ **Images stay private** in Cloudflare Images (no public variant needed)  
-✅ **Next.js proxies images** - Images are fetched server-side with authentication  
-✅ **Cached at CDN edge** - Vercel CDN caches the proxied images for performance  
-✅ **No client-side exposure** - Image URLs are only exposed in final HTML meta tags  
+✅ **Images stay private** in Cloudflare Images (requireSignedURLs enabled)
+✅ **Time-limited access** - Signed URLs expire after 1 hour
+✅ **HMAC-SHA256 signatures** - URLs can't be forged or tampered with
+✅ **Direct delivery** - Images served directly from Cloudflare's global CDN (no proxy overhead)
+✅ **No server bandwidth** - Next.js generates signed URLs but doesn't proxy image data  
 
 ## What Was Implemented
 
 ### 1. Recipe Pages (`/app/recipe/[id]/page.tsx`)
-- Added `generateMetadata()` for Open Graph tags
-- Converted from client-side to server-side rendering
-- Images use proxy: `/api/image-proxy?uri={media_uri}`
+- Server-side rendering with `generateMetadata()` for Open Graph tags
+- Generates signed Cloudflare Image URLs for social media previews
+- Falls back to tomato.png if no image exists
 
 ### 2. Meal Pages (`/app/meal/[id]/page.tsx`)
-- Created new page for meal sharing
+- Server-side rendering for meal sharing
 - Same Open Graph functionality as recipes
-- Images use the same proxy endpoint
+- Uses signed URLs for meal photos
 
-### 3. Image Proxy (`/app/api/image-proxy/route.ts`)
-- Already existed and working correctly
-- Fetches signed URLs from media-api worker
-- Streams images with 24-hour cache headers
+### 3. Image URL Utility (`/lib/imageUrl.ts`)
+- `signImageUrl()` function generates HMAC-SHA256 signed URLs
+- Based on Cloudflare Images signed URL specification
+- 1-hour expiration on all signed URLs
 
 ## Environment Variables
 
-Required in `.env.local` (see `.env.example`):
+Required in `.env.local` and Vercel:
 
 ```bash
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Site config
 NEXT_PUBLIC_BASE_URL=https://biteclub.fun
-NEXT_PUBLIC_MEDIA_API_URL=https://biteclub-media-api.biteclub.workers.dev
+
+# Cloudflare Images (for signed URLs)
+NEXT_PUBLIC_CLOUDFLARE_ACCOUNT_HASH=your_account_hash
+CLOUDFLARE_IMAGES_KEY_VALUE=your_signing_key_secret
 ```
+
+**Important**:
+- `CLOUDFLARE_IMAGES_KEY_VALUE` must be kept secret (server-side only, no `NEXT_PUBLIC_` prefix)
+- Get the signing key from: Cloudflare Dashboard → Images → Signed URL Keys
+- If you don't have a signing key, create one in the Cloudflare Images dashboard
 
 ## Testing Link Previews
 
@@ -80,18 +92,27 @@ NEXT_PUBLIC_MEDIA_API_URL=https://biteclub-media-api.biteclub.workers.dev
 ## Troubleshooting
 
 ### Images not showing in previews
-1. Check that media-api worker is accessible
-2. Verify signed URLs are being generated
-3. Check browser network tab for 403/404 errors on image-proxy
-4. Clear social media cache (use debuggers above)
+1. Check that `CLOUDFLARE_IMAGES_KEY_VALUE` is set in Vercel environment variables
+2. Verify signed URLs are being generated (check Next.js server logs)
+3. Test a signed URL directly in your browser (should load the image)
+4. Check that `requireSignedURLs` is enabled for your Cloudflare Images
+5. Clear social media cache (use debuggers above)
 
 ### Meta tags not updating
 1. Clear social media platform cache
 2. Verify `generateMetadata()` is running server-side
 3. Check page source for `<meta property="og:image">` tags
+4. Verify the signed URL in the og:image tag is valid
 
-### Image proxy errors
-1. Check media-api worker logs in Cloudflare dashboard
-2. Verify Supabase connection is working
-3. Check that media_uri exists in database
+### Signed URL errors
+1. Verify signing key exists in Cloudflare Images dashboard
+2. Check that `CLOUDFLARE_IMAGES_KEY_VALUE` matches the key in Cloudflare
+3. Ensure `NEXT_PUBLIC_CLOUDFLARE_ACCOUNT_HASH` is correct
+4. Test URL generation locally with `signImageUrl()` function
+5. Check that image IDs (media_uri) exist in Cloudflare Images
+
+### 403 Forbidden on images
+1. Signature might be invalid - check the signing key
+2. URL might be expired (1 hour limit)
+3. Account hash might be incorrect
 

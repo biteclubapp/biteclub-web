@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { signImageUrl } from '@/lib/imageUrl';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -80,12 +81,19 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const mealTitle = meal.recipes?.title || meal.name || 'Delicious Meal';
   const title = `${mealTitle} | BiteClub`;
   const description = meal.recipes?.description || `Check out this meal from ${author} on BiteClub`;
-  
-  // Use image proxy to serve private images
+
+  // Generate signed URL for private Cloudflare Images
   const imageUri = meal.meal_media?.[0]?.media_uri;
-  const imageUrl = imageUri 
-    ? `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/api/image-proxy?uri=${encodeURIComponent(imageUri)}`
-    : `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/tomato.png`;
+
+  let imageUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/tomato.png`;
+  if (imageUri) {
+    try {
+      imageUrl = await signImageUrl(imageUri);
+    } catch (error) {
+      console.error('Failed to sign meal image URL:', error);
+      // Fall back to tomato.png on error
+    }
+  }
 
   return {
     title,
@@ -121,11 +129,18 @@ export default async function MealPage({ params }: { params: Promise<{ id: strin
     notFound();
   }
 
-  // Use image proxy for private Cloudflare images
+  // Generate signed URL for private Cloudflare images
   const imageUri = meal.meal_media?.[0]?.media_uri;
-  const imageUrl = imageUri 
-    ? `/api/image-proxy?uri=${encodeURIComponent(imageUri)}`
-    : null;
+
+  let imageUrl: string | null = null;
+  if (imageUri) {
+    try {
+      imageUrl = await signImageUrl(imageUri);
+    } catch (error) {
+      console.error('Failed to sign meal image URL for display:', error);
+      // imageUrl remains null, image won't render
+    }
+  }
 
   const author = meal.profiles?.username || meal.profiles?.full_name || 'BiteClub User';
   const mealTitle = meal.recipes?.title || meal.name || 'Delicious Meal';

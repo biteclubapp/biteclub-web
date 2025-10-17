@@ -1,4 +1,5 @@
 import { Recipe, supabase } from '@/lib/supabase';
+import { signImageUrl } from '@/lib/imageUrl';
 import { ChefHat, Clock, Users } from 'lucide-react';
 import { Metadata } from 'next';
 import Image from 'next/image';
@@ -67,14 +68,21 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const author = recipe.profiles?.username || recipe.profiles?.full_name || 'BiteClub User';
   const title = `${recipe.title} | BiteClub`;
   const description = recipe.description || `Check out this recipe from ${author} on BiteClub`;
-  
-  // Use image proxy to serve private images
+
+  // Generate signed URL for private Cloudflare Images
   // Fallback to original recipe media if this recipe has no media
   const imageUri = recipe.recipe_media?.[0]?.media_uri
     || (recipe as any).original_recipes?.original_recipe_media?.[0]?.media_uri;
-  const imageUrl = imageUri 
-    ? `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/api/image-proxy?uri=${encodeURIComponent(imageUri)}`
-    : `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/tomato.png`;
+
+  let imageUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/tomato.png`;
+  if (imageUri) {
+    try {
+      imageUrl = await signImageUrl(imageUri);
+    } catch (error) {
+      console.error('Failed to sign image URL:', error);
+      // Fall back to tomato.png on error
+    }
+  }
 
   return {
     title,
@@ -111,13 +119,20 @@ export default async function RecipePage({ params }: { params: Promise<{ id: str
     notFound();
   }
 
-  // Use image proxy for private Cloudflare images
+  // Generate signed URL for private Cloudflare images
   // Fallback to original recipe media if this recipe has no media
-  const imageUri = recipe.recipe_media?.[0]?.media_uri 
+  const imageUri = recipe.recipe_media?.[0]?.media_uri
     || (recipe as any).original_recipes?.original_recipe_media?.[0]?.media_uri;
-  const imageUrl = imageUri 
-    ? `/api/image-proxy?uri=${encodeURIComponent(imageUri)}`
-    : null;
+
+  let imageUrl: string | null = null;
+  if (imageUri) {
+    try {
+      imageUrl = await signImageUrl(imageUri);
+    } catch (error) {
+      console.error('Failed to sign image URL for display:', error);
+      // imageUrl remains null, image won't render
+    }
+  }
 
   const author = recipe.profiles?.username || recipe.profiles?.full_name || 'BiteClub User';
   
