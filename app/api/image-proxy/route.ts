@@ -9,31 +9,21 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Request signed URL from media API
-    const response = await fetch(`${process.env.NEXT_PUBLIC_MEDIA_API_URL || 'https://biteclub-media-api.biteclub.workers.dev'}/sign-urls`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        urls: [mediaUri],
-      }),
-    });
-
-    if (!response.ok) {
-      console.error('Failed to get signed URL:', response.statusText);
-      return NextResponse.json({ error: 'Failed to sign URL' }, { status: 500 });
+    // Construct Cloudflare Images URL directly for web sharing
+    // Format: https://imagedelivery.net/{account_hash}/{image_id}/public
+    const accountHash = process.env.NEXT_PUBLIC_CLOUDFLARE_ACCOUNT_HASH;
+    
+    if (!accountHash) {
+      console.error('Missing CLOUDFLARE_ACCOUNT_HASH environment variable');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
-    const data = await response.json();
-    const signedUrl = data.signedUrls?.[0];
+    // Build the public Cloudflare Images URL
+    const cloudflareUrl = `https://imagedelivery.net/${accountHash}/${mediaUri}/public`;
+    console.log('Fetching image from Cloudflare:', cloudflareUrl);
 
-    if (!signedUrl) {
-      return NextResponse.json({ error: 'No signed URL returned' }, { status: 500 });
-    }
-
-    // Fetch the actual image from the signed URL
-    const imageResponse = await fetch(signedUrl);
+    // Fetch the actual image from Cloudflare
+    const imageResponse = await fetch(cloudflareUrl);
     
     if (!imageResponse.ok) {
       return NextResponse.json({ error: 'Failed to fetch image' }, { status: 500 });
