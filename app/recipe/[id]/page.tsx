@@ -1,10 +1,9 @@
-'use client';
-
 import { Recipe, supabase } from '@/lib/supabase';
-import { ChefHat, Clock, Users, X } from 'lucide-react';
+import { ChefHat, Clock, Users } from 'lucide-react';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import StickyBanner from './StickyBanner';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/id6748471652';
 
@@ -42,76 +41,67 @@ async function getRecipe(id: string): Promise<Recipe | null> {
   return data as Recipe;
 }
 
+// Generate Open Graph metadata for social sharing
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const recipe = await getRecipe(id);
 
-function StickyBanner() {
-  const [isVisible, setIsVisible] = useState(true);
+  if (!recipe) {
+    return {
+      title: 'Recipe not found | BiteClub',
+    };
+  }
 
-  if (!isVisible) return null;
+  const author = recipe.users?.username || recipe.users?.full_name || 'BiteClub User';
+  const title = `${recipe.title} | BiteClub`;
+  const description = recipe.description || `Check out this recipe from ${author} on BiteClub`;
+  
+  // Use image proxy to serve private images
+  const imageUri = recipe.recipe_media?.[0]?.media_uri;
+  const imageUrl = imageUri 
+    ? `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/api/image-proxy?uri=${encodeURIComponent(imageUri)}`
+    : `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/tomato.png`;
 
-  return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-lg z-40 animate-slide-up">
-      <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
-        <h3 className="text-base font-bold flex-1" style={{ color: '#3D352E' }}>
-          Want to see more recipes like this?
-        </h3>
-        <a 
-          href={APP_STORE_URL}
-          className="px-5 py-2.5 bg-[#c71c39] text-white rounded-full font-semibold text-sm hover:opacity-90 transition-opacity whitespace-nowrap"
-        >
-          Get the App
-        </a>
-        <button
-          onClick={() => setIsVisible(false)}
-          className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Close"
-        >
-          <X className="w-5 h-5" style={{ color: '#3D352E', opacity: 0.5 }} />
-        </button>
-      </div>
-    </div>
-  );
+  return {
+    title,
+    description,
+    openGraph: {
+      title: recipe.title,
+      description,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: recipe.title,
+        },
+      ],
+      url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/recipe/${id}`,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: recipe.title,
+      description,
+      images: [imageUrl],
+    },
+  };
 }
 
-export default function RecipePage({ params }: { params: Promise<{ id: string }> }) {
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [recipeId, setRecipeId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const unwrapParams = async () => {
-      const { id } = await params;
-      setRecipeId(id);
-    };
-    unwrapParams();
-  }, [params]);
-
-  useEffect(() => {
-    if (!recipeId) return;
-    
-    const fetchRecipe = async () => {
-      const data = await getRecipe(recipeId);
-      setRecipe(data);
-      setLoading(false);
-    };
-    fetchRecipe();
-  }, [recipeId]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-[#c71c39] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-sm" style={{ color: '#3D352E', opacity: 0.7 }}>Loading recipe...</p>
-        </div>
-      </div>
-    );
-  }
+export default async function RecipePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const recipe = await getRecipe(id);
 
   if (!recipe) {
     notFound();
   }
 
-  const imageUrl = recipe.recipe_media?.[0]?.media_uri || null;
+  // Use image proxy for private Cloudflare images
+  const imageUri = recipe.recipe_media?.[0]?.media_uri;
+  const imageUrl = imageUri 
+    ? `/api/image-proxy?uri=${encodeURIComponent(imageUri)}`
+    : null;
 
   const author = recipe.users?.username || recipe.users?.full_name || 'BiteClub User';
 
