@@ -22,6 +22,12 @@ async function getRecipe(id: string): Promise<Recipe | null> {
       recipe_media (
         media_uri,
         media_type
+      ),
+      original_recipes:original_recipe_id (
+        original_recipe_media (
+          media_uri,
+          media_type
+        )
       )
     `)
     .eq('id', id)
@@ -40,6 +46,7 @@ async function getRecipe(id: string): Promise<Recipe | null> {
   console.log('✅ Recipe found:', data.title);
   console.log('📊 Full recipe data:', JSON.stringify(data, null, 2));
   console.log('🖼️ Recipe media:', data.recipe_media);
+  console.log('🖼️ Original recipe media:', (data as any).original_recipes?.original_recipe_media);
   console.log('📝 Instructions:', data.instructions);
   console.log('🥗 Ingredients:', data.ingredients_text);
   
@@ -62,7 +69,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const description = recipe.description || `Check out this recipe from ${author} on BiteClub`;
   
   // Use image proxy to serve private images
-  const imageUri = recipe.recipe_media?.[0]?.media_uri;
+  // Fallback to original recipe media if this recipe has no media
+  const imageUri = recipe.recipe_media?.[0]?.media_uri
+    || (recipe as any).original_recipes?.original_recipe_media?.[0]?.media_uri;
   const imageUrl = imageUri 
     ? `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/api/image-proxy?uri=${encodeURIComponent(imageUri)}`
     : `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/tomato.png`;
@@ -103,7 +112,9 @@ export default async function RecipePage({ params }: { params: Promise<{ id: str
   }
 
   // Use image proxy for private Cloudflare images
-  const imageUri = recipe.recipe_media?.[0]?.media_uri;
+  // Fallback to original recipe media if this recipe has no media
+  const imageUri = recipe.recipe_media?.[0]?.media_uri 
+    || (recipe as any).original_recipes?.original_recipe_media?.[0]?.media_uri;
   const imageUrl = imageUri 
     ? `/api/image-proxy?uri=${encodeURIComponent(imageUri)}`
     : null;
