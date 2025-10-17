@@ -34,12 +34,12 @@ async function getMeal(id: string): Promise<Meal | null> {
     .from('meals')
     .select(`
       *,
-      users:user_id (
+      users!meals_user_id_fkey (
         username,
         full_name,
         avatar_url
       ),
-      recipes:recipe_id (
+      recipes!meals_recipe_id_fkey (
         title,
         description
       ),

@@ -14,7 +14,7 @@ async function getRecipe(id: string): Promise<Recipe | null> {
     .from('recipes')
     .select(`
       *,
-      users:user_id (
+      users!recipes_user_id_fkey (
         username,
         full_name,
         avatar_url
@@ -104,6 +104,15 @@ export default async function RecipePage({ params }: { params: Promise<{ id: str
     : null;
 
   const author = recipe.users?.username || recipe.users?.full_name || 'BiteClub User';
+  
+  // Debug logging
+  console.log('🔍 Recipe data:', {
+    hasImage: !!imageUrl,
+    hasInstructions: !!(recipe.instructions && Array.isArray(recipe.instructions) && recipe.instructions.length > 0),
+    hasIngredients: !!(recipe.ingredients_text && recipe.ingredients_text.length > 0),
+    instructionsCount: Array.isArray(recipe.instructions) ? recipe.instructions.length : 0,
+    ingredientsCount: recipe.ingredients_text?.length || 0,
+  });
 
   return (
     <div className="min-h-screen bg-white">
