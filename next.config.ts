@@ -1,20 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'pub-ca0ab7fed5b0430eab01b4d5f265bc26.r2.dev',
-        port: '',
-        pathname: '/**',
-      },
-    ],
-  },
+  /* config options here */
   async headers() {
     return [
       {
-        // Apple App Site Association file
+        // Serve apple-app-site-association without .json extension and proper content-type
         source: '/.well-known/apple-app-site-association',
         headers: [
           {
@@ -24,8 +15,8 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Android Digital Asset Links file
-        source: '/.well-known/assetlinks.json',
+        // Also support the .json extension for compatibility
+        source: '/.well-known/apple-app-site-association.json',
         headers: [
           {
             key: 'Content-Type',

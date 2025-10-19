@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appID": "WQHKN43K8Z.com.wejarrard.biteclub",
+        "appID": "L5CGVVAV7V.com.wejarrard.biteclub",
         "paths": [
           "/recipe/*",
           "/meal/*"
@@ -12,4 +12,3 @@
     ]
   }
 }
-
