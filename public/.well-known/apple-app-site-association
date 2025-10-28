@@ -3,10 +3,14 @@
     "apps": [],
     "details": [
       {
-        "appID": "L5CGVVAV7V.com.wejarrard.biteclub",
-        "paths": [
-          "/recipe/*",
-          "/meal/*"
+        "appIDs": ["L5CGVVAV7V.com.wejarrard.biteclub"],
+        "components": [
+          {
+            "/": "/recipe/*"
+          },
+          {
+            "/": "/meal/*"
+          }
         ]
       }
     ]
