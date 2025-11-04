@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { ChevronDown, Users, BookOpen, Camera, TrendingUp, Heart, Menu, X, ChefHat, Award, LineChart } from 'lucide-react'
 
 export default function Page() {
@@ -55,9 +56,13 @@ export default function Page() {
       <nav className="relative z-50 px-6 py-6 lg:px-12 bg-white/80 backdrop-blur-md sticky top-0 border-b border-gray-200">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-lg" style={{ backgroundColor: '#c71c39' }}>
-              B
-            </div>
+            <Image
+              src="/icon.png"
+              alt="BiteClub"
+              width={40}
+              height={40}
+              className="rounded-xl shadow-lg"
+            />
             <span className="text-xl font-bold" style={{ color: '#3D352E' }}>BiteClub</span>
           </div>
 
@@ -316,9 +321,13 @@ export default function Page() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white shadow-md" style={{ backgroundColor: '#c71c39' }}>
-                  B
-                </div>
+                <Image
+                  src="/icon.png"
+                  alt="BiteClub"
+                  width={32}
+                  height={32}
+                  className="rounded-lg shadow-md"
+                />
                 <span className="font-bold" style={{ color: '#3D352E' }}>BiteClub</span>
               </div>
               <p className="text-gray-600 text-sm">Your cooking identity. Your community.</p>
