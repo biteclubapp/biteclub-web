@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ChevronDown, Users, BookOpen, Camera, TrendingUp, Heart, MessageCircle, Star, ArrowRight, Check, Menu, X, Sparkles, Zap } from 'lucide-react'
+import { ChevronDown, Users, BookOpen, Camera, TrendingUp, Heart, Menu, X, ChefHat, Award, LineChart } from 'lucide-react'
 
 export default function Page() {
   const [scrollY, setScrollY] = useState(0)
@@ -16,80 +16,64 @@ export default function Page() {
   const features = [
     {
       icon: <Camera className="w-6 h-6" />,
-      title: "Log Every Meal",
-      description: "Snap photos, add notes, and build your personal cookbook of wins"
+      title: "Build Your Cooking Profile",
+      description: "Every dish you log becomes part of your cooking story. Create a living record of who you are as a cook."
     },
     {
       icon: <Users className="w-6 h-6" />,
-      title: "Follow Friends' Kitchens",
-      description: "See what your crew is cooking in real-time, just like following workouts"
+      title: "Connect Through Cooking",
+      description: "See what your friends are making. Share recipes. Cook together, apart."
     },
     {
       icon: <BookOpen className="w-6 h-6" />,
-      title: "Save & Share Recipes",
-      description: "Import from anywhere or create your own - never lose a recipe again"
+      title: "Your Personal Cookbook",
+      description: "Save recipes, add your notes, and build a collection that reflects your taste."
     },
     {
       icon: <TrendingUp className="w-6 h-6" />,
-      title: "Track Your Journey",
-      description: "Watch your cooking skills evolve with every meal you log"
+      title: "Watch Yourself Grow",
+      description: "Track your journey from simple meals to complex techniques. See your progress over time."
     },
     {
       icon: <Heart className="w-6 h-6" />,
-      title: "Celebrate Together",
-      description: "Give kudos, swap tips, and keep the kitchen conversation alive"
+      title: "Celebrate Each Other",
+      description: "Share encouragement, exchange tips, and build a community around real cooking."
     },
     {
-      icon: <Star className="w-6 h-6" />,
-      title: "Set Cooking Goals",
-      description: "Challenge yourself to try new cuisines, techniques, or ingredients"
+      icon: <Award className="w-6 h-6" />,
+      title: "Define Your Style",
+      description: "Your profile tells your cooking story. What you make, how you make it, what matters to you."
     }
   ]
 
-  const earlyAccessPerks = [
-    "Claim your unique username",
-    "Shape the future of BiteClub",
-    "Exclusive founding member badge",
-    "Priority access to new features",
-    "Join the first 1,000 members"
-  ]
-
   return (
-    <div className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-white to-pink-50" />
-        <div className="absolute top-20 left-10 w-72 h-72 bg-orange-200/30 rounded-full blur-[128px] animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-pink-200/30 rounded-full blur-[128px] animate-pulse animation-delay-2000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-yellow-100/20 rounded-full blur-[200px]" />
-      </div>
+    <div className="min-h-screen bg-white overflow-x-hidden" style={{ color: '#3D352E' }}>
+      {/* Simple Background */}
+      <div className="fixed inset-0 z-0 bg-gradient-to-b from-gray-50 to-white" />
 
       {/* Navigation */}
-      <nav className="relative z-50 px-6 py-6 lg:px-12 bg-white/80 backdrop-blur-md sticky top-0 border-b border-gray-100">
+      <nav className="relative z-50 px-6 py-6 lg:px-12 bg-white/80 backdrop-blur-md sticky top-0 border-b border-gray-200">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-pink-600 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-lg">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-lg" style={{ backgroundColor: '#c71c39' }}>
               B
             </div>
-            <span className="text-xl font-bold text-gray-900">BiteClub</span>
-            <span className="hidden sm:inline-flex items-center px-2 py-1 bg-gradient-to-r from-orange-500 to-pink-600 text-white text-xs font-semibold rounded-full ml-2">
-              <Sparkles className="w-3 h-3 mr-1" />
-              LAUNCHING SOON
-            </span>
+            <span className="text-xl font-bold" style={{ color: '#3D352E' }}>BiteClub</span>
           </div>
-          
+
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-gray-600 hover:text-orange-600 transition-colors">Features</a>
-            <a href="#how" className="text-gray-600 hover:text-orange-600 transition-colors">How it Works</a>
-            <a href="#early-access" className="text-gray-600 hover:text-orange-600 transition-colors">Early Access</a>
-            <button className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold hover:shadow-xl hover:shadow-orange-200 transition-all transform hover:scale-105">
-              Join Waitlist
+            <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
+            <a href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">About</a>
+            <a href="#join" className="text-gray-600 hover:text-gray-900 transition-colors">Get Started</a>
+            <button className="px-6 py-2.5 text-white rounded-full font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: '#c71c39' }}>
+              Get the App
             </button>
           </div>
 
-          <button 
+          <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-gray-700"
+            className="md:hidden"
+            style={{ color: '#3D352E' }}
           >
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
@@ -97,12 +81,12 @@ export default function Page() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg p-6 space-y-4 border-b border-gray-100 shadow-xl">
-            <a href="#features" className="block py-2 text-gray-600 hover:text-orange-600 transition-colors">Features</a>
-            <a href="#how" className="block py-2 text-gray-600 hover:text-orange-600 transition-colors">How it Works</a>
-            <a href="#early-access" className="block py-2 text-gray-600 hover:text-orange-600 transition-colors">Early Access</a>
-            <button className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold">
-              Join Waitlist
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg p-6 space-y-4 border-b border-gray-200 shadow-xl">
+            <a href="#features" className="block py-2 text-gray-600">Features</a>
+            <a href="#about" className="block py-2 text-gray-600">About</a>
+            <a href="#join" className="block py-2 text-gray-600">Get Started</a>
+            <button className="w-full px-6 py-3 text-white rounded-full font-semibold" style={{ backgroundColor: '#c71c39' }}>
+              Get the App
             </button>
           </div>
         )}
@@ -111,86 +95,70 @@ export default function Page() {
       {/* Hero Section */}
       <section className="relative z-10 px-6 py-20 lg:py-32 lg:px-12">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-orange-100 to-pink-100 rounded-full mb-8 border border-orange-200">
-            <Zap className="w-4 h-4 text-orange-600" />
-            <span className="text-sm font-semibold text-gray-700">The Brand New Social Network for Home Cooks</span>
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-full mb-8 border border-gray-200">
+            <ChefHat className="w-4 h-4" style={{ color: '#c71c39' }} />
+            <span className="text-sm font-semibold" style={{ color: '#3D352E' }}>Your Cooking. Your Story. Your Community.</span>
           </div>
-          
-          <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-gray-900">See What Your Friends</span>
+
+          <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight" style={{ color: '#3D352E' }}>
+            Build Your
             <br />
-            <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent">
-              Are Cooking Tonight
-            </span>
+            <span style={{ color: '#c71c39' }}>Cooking Identity</span>
           </h1>
-          
+
           <p className="text-xl lg:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            BiteClub is the Strava for cooking. Share your meals, discover amazing recipes, and turn every dish into a social experience. Join the kitchen revolution.
+            BiteClub gives you a relationship with your cooking. Like Strava for running or Goodreads for reading, BiteClub is where you build a living record of who you are as a cook.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <button className="group px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-2xl hover:shadow-orange-200 transition-all transform hover:scale-105 flex items-center justify-center">
-              Get Early Access
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <button className="group px-8 py-4 text-white rounded-full font-semibold text-lg hover:opacity-90 transition-opacity flex items-center justify-center" style={{ backgroundColor: '#c71c39' }}>
+              Start Your Profile
+              <Camera className="ml-2 w-5 h-5" />
             </button>
-            <button className="px-8 py-4 bg-gray-100 text-gray-700 rounded-full font-semibold text-lg hover:bg-gray-200 transition-all border border-gray-200">
-              Watch Demo
+            <button className="px-8 py-4 bg-gray-100 rounded-full font-semibold text-lg hover:bg-gray-200 transition-all border border-gray-200" style={{ color: '#3D352E' }}>
+              See How It Works
             </button>
           </div>
 
-          {/* Launch Countdown */}
-          <div className="inline-flex items-center space-x-6 px-6 py-4 bg-white rounded-2xl shadow-xl border border-gray-100">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">127</div>
-              <div className="text-xs text-gray-500 uppercase">Spots Left</div>
-            </div>
-            <div className="w-px h-12 bg-gray-200" />
-            <div className="text-center">
-              <div className="text-2xl font-bold text-pink-600">873</div>
-              <div className="text-xs text-gray-500 uppercase">On Waitlist</div>
-            </div>
-            <div className="w-px h-12 bg-gray-200" />
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">Jan '25</div>
-              <div className="text-xs text-gray-500 uppercase">Launch Date</div>
-            </div>
-          </div>
-
-          <div className="animate-bounce mt-12">
+          <div className="mt-12">
             <ChevronDown className="w-8 h-8 mx-auto text-gray-400" />
           </div>
         </div>
       </section>
 
       {/* What Makes Us Different */}
-      <section className="relative z-10 py-20 bg-gradient-to-b from-orange-50/50 to-pink-50/50">
+      <section className="relative z-10 py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="text-center mb-12">
-            <span className="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-700 text-sm font-semibold rounded-full mb-4">
-              <Sparkles className="w-3 h-3 mr-1" />
-              Why BiteClub
-            </span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
-              Finally, a social network that celebrates
-              <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent"> real cooking</span>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4" style={{ color: '#3D352E' }}>
+              More than a recipe app
             </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              BiteClub is about identity. It's about who you are as a cook and how you share that with others.
+            </p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="text-center p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
-              <div className="text-4xl mb-3">🍳</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Not Just Pretty Pictures</h3>
-              <p className="text-gray-600 text-sm">Track your cooking journey with real stats, streaks, and achievements</p>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="p-8 bg-white rounded-2xl shadow-lg border border-gray-200">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: '#c71c39' }}>
+                <LineChart className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold mb-2 text-xl" style={{ color: '#3D352E' }}>Your Cooking Story</h3>
+              <p className="text-gray-600">Every dish becomes part of your profile. Build a visual record of your cooking journey over time.</p>
             </div>
-            <div className="text-center p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
-              <div className="text-4xl mb-3">👥</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Your Real Friends</h3>
-              <p className="text-gray-600 text-sm">See what your actual friends are cooking, not influencers or ads</p>
+            <div className="p-8 bg-white rounded-2xl shadow-lg border border-gray-200">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: '#c71c39' }}>
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold mb-2 text-xl" style={{ color: '#3D352E' }}>Real Community</h3>
+              <p className="text-gray-600">Connect with friends through what you cook. No algorithms, no ads—just authentic sharing.</p>
             </div>
-            <div className="text-center p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
-              <div className="text-4xl mb-3">📱</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Built for Home Cooks</h3>
-              <p className="text-gray-600 text-sm">Quick logging, smart recipe import, and features that actually help</p>
+            <div className="p-8 bg-white rounded-2xl shadow-lg border border-gray-200">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: '#c71c39' }}>
+                <ChefHat className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold mb-2 text-xl" style={{ color: '#3D352E' }}>Pride in Progress</h3>
+              <p className="text-gray-600">See yourself grow as a cook. Track what you make, celebrate wins, learn from experiments.</p>
             </div>
           </div>
         </div>
@@ -200,26 +168,24 @@ export default function Page() {
       <section id="features" className="relative z-10 py-20 lg:py-32 px-6 lg:px-12">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-gray-900">
-              Everything you need to make
-              <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent"> cooking social</span>
+            <h2 className="text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#3D352E' }}>
+              Built for your cooking life
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              We're building the features home cooks actually want. No fluff, just the good stuff.
+              Simple tools that help you document, share, and grow as a cook.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, i) => (
-              <div 
+              <div
                 key={i}
-                className="group p-8 rounded-2xl bg-white shadow-lg hover:shadow-2xl border border-gray-100 transition-all hover:-translate-y-1"
-                style={{ animationDelay: `${i * 100}ms` }}
+                className="group p-8 rounded-2xl bg-white shadow-lg hover:shadow-xl border border-gray-200 transition-all"
               >
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-white shadow-lg">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-white shadow-md" style={{ backgroundColor: '#c71c39' }}>
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-900">{feature.title}</h3>
+                <h3 className="text-xl font-semibold mb-2" style={{ color: '#3D352E' }}>{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
               </div>
             ))}
@@ -228,169 +194,119 @@ export default function Page() {
       </section>
 
       {/* How It Works */}
-      <section id="how" className="relative z-10 py-20 lg:py-32 px-6 lg:px-12 bg-gradient-to-b from-white via-purple-50/30 to-white">
+      <section id="about" className="relative z-10 py-20 lg:py-32 px-6 lg:px-12 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-gray-900">
-              As Easy as
-              <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent"> Cook, Snap, Share</span>
+            <h2 className="text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#3D352E' }}>
+              How it works
             </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Simple, intentional, and rewarding. BiteClub fits naturally into your cooking life.
+            </p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-12">
-            <div className="text-center group">
-              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-orange-100 to-pink-100 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-                  1
-                </div>
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-6 shadow-lg" style={{ backgroundColor: '#c71c39' }}>
+                <span className="text-3xl font-bold text-white">1</span>
               </div>
-              <h3 className="text-2xl font-semibold mb-3 text-gray-900">Cook Something Amazing</h3>
-              <p className="text-gray-600">Whether it's your grandma's recipe or a wild experiment, every meal counts</p>
+              <h3 className="text-2xl font-semibold mb-3" style={{ color: '#3D352E' }}>Cook & Document</h3>
+              <p className="text-gray-600 max-w-sm mx-auto">Log what you make. Add photos. Save recipes. Every meal becomes part of your story.</p>
             </div>
 
-            <div className="text-center group">
-              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-orange-100 to-pink-100 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-                  2
-                </div>
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-6 shadow-lg" style={{ backgroundColor: '#c71c39' }}>
+                <span className="text-3xl font-bold text-white">2</span>
               </div>
-              <h3 className="text-2xl font-semibold mb-3 text-gray-900">Share with Your Crew</h3>
-              <p className="text-gray-600">Post photos, add details, and let your friends see what you're plating up</p>
+              <h3 className="text-2xl font-semibold mb-3" style={{ color: '#3D352E' }}>Share & Connect</h3>
+              <p className="text-gray-600 max-w-sm mx-auto">Let friends see what you're cooking. Discover what inspires them. Build connections through food.</p>
             </div>
 
-            <div className="text-center group">
-              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-orange-100 to-pink-100 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-                  3
-                </div>
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-6 shadow-lg" style={{ backgroundColor: '#c71c39' }}>
+                <span className="text-3xl font-bold text-white">3</span>
               </div>
-              <h3 className="text-2xl font-semibold mb-3 text-gray-900">Get Inspired Daily</h3>
-              <p className="text-gray-600">Discover new dishes, save recipes, and turn your feed into your cookbook</p>
+              <h3 className="text-2xl font-semibold mb-3" style={{ color: '#3D352E' }}>Build Your Identity</h3>
+              <p className="text-gray-600 max-w-sm mx-auto">Your profile becomes a reflection of you as a cook. A record you're proud of.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Early Access Section */}
-      <section id="early-access" className="relative z-10 py-20 lg:py-32 px-6 lg:px-12 bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <span className="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-700 text-sm font-semibold rounded-full mb-6">
-                <Zap className="w-3 h-3 mr-1" />
-                LIMITED EARLY ACCESS
-              </span>
-              <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
-                Be Part of the
-                <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent"> Founding Community</span>
-              </h2>
-              <p className="text-xl text-gray-700 mb-8">
-                Join the first 1,000 members shaping the future of social cooking. Get exclusive perks and help us build the platform home cooks deserve.
-              </p>
-              
-              <div className="space-y-4 mb-8">
-                {earlyAccessPerks.map((item, i) => (
-                  <div key={i} className="flex items-center space-x-3">
-                    <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-pink-600 rounded-full flex items-center justify-center shadow-md">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-gray-700">{item}</span>
-                  </div>
-                ))}
-              </div>
+      {/* Join Section */}
+      <section id="join" className="relative z-10 py-20 lg:py-32 px-6 lg:px-12">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-12 lg:p-16 text-center">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6" style={{ color: '#3D352E' }}>
+              Start building your cooking identity
+            </h2>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              Join home cooks who are documenting their cooking journey, sharing with friends, and building something they're proud of.
+            </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="group px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-2xl hover:shadow-orange-200 transition-all transform hover:scale-105 flex items-center justify-center">
-                  Claim Your Spot
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <button className="px-8 py-4 bg-white text-gray-700 rounded-full font-semibold text-lg hover:bg-gray-50 transition-all border border-gray-200">
-                  Learn More
-                </button>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <button className="px-8 py-4 text-white rounded-full font-semibold text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#c71c39' }}>
+                Get Started
+              </button>
+              <button className="px-8 py-4 bg-gray-100 rounded-full font-semibold text-lg hover:bg-gray-200 transition-all border border-gray-200" style={{ color: '#3D352E' }}>
+                Learn More
+              </button>
             </div>
 
-            <div className="relative">
-              <div className="aspect-square bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
-                <div className="h-full bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl flex items-center justify-center border border-orange-100">
-                  <div className="text-center p-8">
-                    <div className="text-6xl mb-4">🚀</div>
-                    <p className="text-2xl font-bold text-gray-900 mb-2">Launching January 2025</p>
-                    <p className="text-gray-600 mb-6">Be first to experience the future of social cooking</p>
-                    <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
-                      127 spots remaining
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Floating UI Elements */}
-              <div className="absolute -top-4 -right-4 px-4 py-2 bg-white rounded-full text-sm font-semibold shadow-xl border border-gray-100 animate-bounce">
-                <Heart className="inline w-4 h-4 mr-1 text-red-500" /> 42 kudos
-              </div>
-              <div className="absolute -bottom-4 -left-4 px-4 py-2 bg-white rounded-full text-sm font-semibold shadow-xl border border-gray-100 animate-bounce animation-delay-1000">
-                <MessageCircle className="inline w-4 h-4 mr-1 text-blue-500" /> "Looks amazing!"
-              </div>
-            </div>
+            <p className="text-sm text-gray-500">
+              Available on iOS and Android
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Testimonials/Vision */}
-      <section className="relative z-10 py-20 lg:py-32 px-6 lg:px-12">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
-            We're Building Something
-            <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent"> Special</span>
-          </h2>
-          <p className="text-xl text-gray-600 mb-12">
-            BiteClub isn't just another app. It's a movement to bring people together through food, celebrate home cooking, and make every meal a shared experience. 
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
-              <div className="text-3xl mb-3">🌍</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Global Kitchen</h3>
-              <p className="text-gray-600 text-sm">Connect with home cooks worldwide and discover authentic recipes from every culture</p>
+      {/* Vision */}
+      <section className="relative z-10 py-20 lg:py-32 px-6 lg:px-12 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6" style={{ color: '#3D352E' }}>
+              What makes BiteClub different
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              We're focused on giving people a deeper relationship with their cooking—one that celebrates progress, community, and authentic creativity.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="p-8 bg-white rounded-2xl shadow-lg border border-gray-200">
+              <h3 className="font-semibold text-xl mb-3" style={{ color: '#3D352E' }}>Reward Authentic Cooking</h3>
+              <p className="text-gray-600">No algorithms chasing virality. Just you, your cooking, and the people who matter. Share what you make, not what performs.</p>
             </div>
-            <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
-              <div className="text-3xl mb-3">💪</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Level Up Together</h3>
-              <p className="text-gray-600 text-sm">Track progress, earn achievements, and motivate each other to try new things</p>
+            <div className="p-8 bg-white rounded-2xl shadow-lg border border-gray-200">
+              <h3 className="font-semibold text-xl mb-3" style={{ color: '#3D352E' }}>Own Your Cooking Story</h3>
+              <p className="text-gray-600">Your profile is yours. A living record of your cooking journey that grows with you and reflects who you are.</p>
             </div>
-            <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
-              <div className="text-3xl mb-3">❤️</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Real Connections</h3>
-              <p className="text-gray-600 text-sm">Bond over shared meals, family recipes, and the universal language of good food</p>
+            <div className="p-8 bg-white rounded-2xl shadow-lg border border-gray-200">
+              <h3 className="font-semibold text-xl mb-3" style={{ color: '#3D352E' }}>Connect Through Food</h3>
+              <p className="text-gray-600">See what friends are making. Solve "what's for dinner" together. Build real connections, not follower counts.</p>
+            </div>
+            <div className="p-8 bg-white rounded-2xl shadow-lg border border-gray-200">
+              <h3 className="font-semibold text-xl mb-3" style={{ color: '#3D352E' }}>Grow as a Cook</h3>
+              <p className="text-gray-600">Track your progress over time. See patterns in what you cook. Celebrate how far you've come.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="relative z-10 py-20 lg:py-32 px-6 lg:px-12 bg-gradient-to-br from-orange-600 to-pink-600">
+      <section className="relative z-10 py-20 lg:py-32 px-6 lg:px-12" style={{ backgroundColor: '#c71c39' }}>
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-6xl font-bold mb-6 text-white">
-            Ready to Join the Kitchen Revolution?
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
+            Ready to start your cooking story?
           </h2>
           <p className="text-xl text-white/90 mb-12">
-            Don't miss your chance to be part of BiteClub from day one. Limited spots available.
+            Join BiteClub and build a relationship with your cooking.
           </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="group px-8 py-4 bg-white text-gray-900 rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-black/20 transition-all transform hover:scale-105 flex items-center justify-center">
-              Get Early Access Now
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-full font-bold text-lg hover:bg-white/30 transition-all border-2 border-white/50">
-              Follow Our Journey
-            </button>
-          </div>
-          
-          <p className="text-white/80 text-sm mt-8">
-            🔥 873 people on the waitlist • 127 early access spots left
-          </p>
+
+          <button className="px-10 py-4 bg-white rounded-full font-semibold text-lg hover:bg-gray-100 transition-all flex items-center justify-center mx-auto" style={{ color: '#c71c39' }}>
+            Get the App
+            <Camera className="ml-2 w-5 h-5" />
+          </button>
         </div>
       </section>
 
@@ -400,44 +316,44 @@ export default function Page() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-pink-600 rounded-lg flex items-center justify-center font-bold text-white shadow-md">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white shadow-md" style={{ backgroundColor: '#c71c39' }}>
                   B
                 </div>
-                <span className="font-bold text-gray-900">BiteClub</span>
+                <span className="font-bold" style={{ color: '#3D352E' }}>BiteClub</span>
               </div>
-              <p className="text-gray-600 text-sm">The social network for home cooks. Launching January 2025.</p>
+              <p className="text-gray-600 text-sm">Your cooking identity. Your community.</p>
             </div>
-            
+
             <div>
-              <h4 className="font-semibold mb-4 text-gray-900">Product</h4>
+              <h4 className="font-semibold mb-4" style={{ color: '#3D352E' }}>Product</h4>
               <div className="space-y-2 text-gray-600 text-sm">
                 <p>Features</p>
-                <p>Roadmap</p>
+                <p>How it Works</p>
                 <p>FAQ</p>
               </div>
             </div>
-            
+
             <div>
-              <h4 className="font-semibold mb-4 text-gray-900">Company</h4>
+              <h4 className="font-semibold mb-4" style={{ color: '#3D352E' }}>Company</h4>
               <div className="space-y-2 text-gray-600 text-sm">
                 <p>About</p>
                 <p>Blog</p>
-                <p>Press Kit</p>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4 text-gray-900">Connect</h4>
-              <div className="space-y-2 text-gray-600 text-sm">
-                <p>Twitter</p>
-                <p>Instagram</p>
                 <p>Contact</p>
               </div>
             </div>
+
+            <div>
+              <h4 className="font-semibold mb-4" style={{ color: '#3D352E' }}>Connect</h4>
+              <div className="space-y-2 text-gray-600 text-sm">
+                <p>Twitter</p>
+                <p>Instagram</p>
+                <p>Support</p>
+              </div>
+            </div>
           </div>
-          
+
           <div className="text-center text-gray-500 text-sm pt-8 border-t border-gray-200">
-            © 2024 BiteClub. All rights reserved. Made with ❤️ for home cooks everywhere.
+            © 2024 BiteClub. All rights reserved.
           </div>
         </div>
       </footer>
