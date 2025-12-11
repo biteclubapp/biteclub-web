@@ -5,6 +5,21 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Server-side Supabase client with service role key (bypasses RLS)
+// Only use this for server-side operations
+function createServerClient() {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceRoleKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for server-side operations');
+  }
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
+
 // Type for recipe data
 export interface Recipe {
   id: string;
@@ -52,8 +67,11 @@ export interface Club {
 // Helper function to fetch club data
 export async function getClub(clubId: string): Promise<Club | null> {
   try {
+    // Use server client for server-side queries (bypasses RLS)
+    const serverClient = createServerClient();
+    
     // Fetch club data with head chef info
-    const { data: club, error } = await supabase
+    const { data: club, error } = await serverClient
       .from('clubs')
       .select(`
         id,
@@ -79,7 +97,7 @@ export async function getClub(clubId: string): Promise<Club | null> {
     }
 
     // Get member count
-    const { count, error: countError } = await supabase
+    const { count, error: countError } = await serverClient
       .from('club_members')
       .select('*', { count: 'exact', head: true })
       .eq('club_id', clubId)
