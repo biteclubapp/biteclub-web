@@ -65,9 +65,9 @@ export default function Page() {
             <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
             <a href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">About</a>
             <a href="#join" className="text-gray-600 hover:text-gray-900 transition-colors">Get Started</a>
-            <button className="px-6 py-2.5 text-white rounded-full font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: '#c71c39' }}>
+            <a href="https://apps.apple.com/app/id6748471652" target="_blank" rel="noopener noreferrer" className="px-6 py-2.5 text-white rounded-full font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: '#c71c39' }}>
               Get the App
-            </button>
+            </a>
           </div>
 
           <button
@@ -85,9 +85,9 @@ export default function Page() {
             <a href="#features" className="block py-2 text-gray-600">Features</a>
             <a href="#about" className="block py-2 text-gray-600">About</a>
             <a href="#join" className="block py-2 text-gray-600">Get Started</a>
-            <button className="w-full px-6 py-3 text-white rounded-full font-semibold" style={{ backgroundColor: '#c71c39' }}>
+            <a href="https://apps.apple.com/app/id6748471652" target="_blank" rel="noopener noreferrer" className="block w-full px-6 py-3 text-white rounded-full font-semibold text-center" style={{ backgroundColor: '#c71c39' }}>
               Get the App
-            </button>
+            </a>
           </div>
         )}
       </nav>
@@ -303,10 +303,10 @@ export default function Page() {
             Join BiteClub and build a relationship with your cooking.
           </p>
 
-          <button className="px-10 py-4 bg-white rounded-full font-semibold text-lg hover:bg-gray-100 transition-all flex items-center justify-center mx-auto" style={{ color: '#c71c39' }}>
+          <a href="https://apps.apple.com/app/id6748471652" target="_blank" rel="noopener noreferrer" className="px-10 py-4 bg-white rounded-full font-semibold text-lg hover:bg-gray-100 transition-all flex items-center justify-center mx-auto" style={{ color: '#c71c39' }}>
             Get the App
             <Camera className="ml-2 w-5 h-5" />
-          </button>
+          </a>
         </div>
       </section>
 
@@ -353,7 +353,7 @@ export default function Page() {
           </div>
 
           <div className="text-center text-gray-500 text-sm pt-8 border-t border-gray-200">
-            © 2024 BiteClub. All rights reserved.
+            © 2025 BiteClub. All rights reserved.
           </div>
         </div>
       </footer>
