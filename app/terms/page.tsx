@@ -6,6 +6,7 @@ export default function TermsPage() {
   const [activeSection, setActiveSection] = useState('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileTocOpen, setMobileTocOpen] = useState(false)
+  const appStoreUrl = 'https://apps.apple.com/app/id6748471652'
 
   useEffect(() => {
     const handleScroll = () => {
@@ -70,15 +71,15 @@ export default function TermsPage() {
               <span className="text-xl font-bold text-gray-900">BiteClub</span>
             </a>
             <ChevronRight className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-600">Terms of Service</span>
+            <span className="text-gray-600">BiteClub - Eat Together Terms of Service</span>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
             <a href="/" className="text-gray-600 hover:text-orange-600 transition-colors">Home</a>
             <a href="/privacy" className="text-gray-600 hover:text-orange-600 transition-colors">Privacy</a>
-            <button className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold hover:shadow-xl hover:shadow-orange-200 transition-all transform hover:scale-105">
+            <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold hover:shadow-xl hover:shadow-orange-200 transition-all transform hover:scale-105">
               Get the App
-            </button>
+            </a>
           </div>
 
           <button 
@@ -94,9 +95,9 @@ export default function TermsPage() {
           <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg p-6 space-y-4 border-b border-gray-100 shadow-xl">
             <a href="/" className="block py-2 text-gray-600">Home</a>
             <a href="/privacy" className="block py-2 text-gray-600">Privacy</a>
-            <button className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold">
+            <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="block w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-full font-semibold text-center">
               Get the App
-            </button>
+            </a>
           </div>
         )}
       </nav>
@@ -169,12 +170,11 @@ export default function TermsPage() {
                 <FileText className="w-3 h-3 mr-1" />
                 Legal Agreement
               </div>
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">Terms of Service</h1>
+              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">BiteClub - Eat Together Terms of Service</h1>
               <p className="text-xl text-gray-600">Last updated: August 18, 2025</p>
               <div className="mt-6 p-6 bg-gradient-to-r from-orange-50 to-pink-50 rounded-2xl border border-orange-100">
                 <p className="text-gray-700">
-                  These Terms of Service ("Terms") govern your access to and use of the BiteClub mobile application and related services (the "Service"). 
-                  By using the Service, you agree to these Terms.
+                  These Terms of Service ("Terms") govern your access to and use of <strong>BiteClub - Eat Together</strong> (the "App"), the public consumer mobile application operated under the BiteClub brand, and related services (the "Service"). By using the Service, you agree to these Terms.
                 </p>
               </div>
             </div>
@@ -495,9 +495,9 @@ export default function TermsPage() {
                 15. Contact
               </h2>
               <div className="p-6 bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl border border-orange-100">
-                <p className="text-gray-700 mb-4">For questions about these Terms, contact us at:</p>
+                <p className="text-gray-700 mb-4">For questions about these Terms for BiteClub - Eat Together, contact us at:</p>
                 <div className="space-y-2">
-                  <p className="font-semibold text-gray-900">BiteClub</p>
+                  <p className="font-semibold text-gray-900">BiteClub - Eat Together</p>
                   <div className="flex items-center space-x-2 text-gray-700">
                     <Mail className="w-4 h-4 text-orange-500" />
                     <a href="mailto:wejarrard@gmail.com" className="hover:text-orange-600 transition-colors">wejarrard@gmail.com</a>
@@ -552,7 +552,7 @@ export default function TermsPage() {
             </div>
             <span className="font-bold text-gray-900">BiteClub</span>
           </div>
-          <p className="text-gray-600 text-sm mb-4">The social network for home cooks.</p>
+          <p className="text-gray-600 text-sm mb-4">The public social cooking app for home cooks, listed as BiteClub - Eat Together.</p>
           <div className="flex justify-center space-x-6 text-sm">
             <a href="/" className="text-gray-600 hover:text-orange-600 transition-colors">Home</a>
             <a href="/privacy" className="text-gray-600 hover:text-orange-600 transition-colors">Privacy</a>

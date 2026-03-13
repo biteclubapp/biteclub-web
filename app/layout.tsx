@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BiteClub - Build Your Cooking Identity | Social Cooking App",
+  title: "BiteClub - Eat Together | Social Cooking App",
   description:
-    "BiteClub is the cooking identity app for home cooks. Build your cooking profile, track your journey, share recipes with friends, and grow as a cook. Like Strava for cooking.",
+    "BiteClub - Eat Together is the public social cooking app for home cooks. Build your cooking profile, track your journey, share recipes with friends, and grow as a cook.",
   keywords: [
     "cooking identity app",
     "social cooking app",
@@ -32,11 +32,11 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "BiteClub - Build Your Cooking Identity",
+    title: "BiteClub - Eat Together",
     description:
-      "The social cooking app for home cooks. Build your profile, track your journey, and share what you cook with friends.",
+      "The public social cooking app for home cooks. Build your profile, track your journey, and share what you cook with friends.",
     url: "https://biteclub.fun",
-    siteName: "BiteClub",
+    siteName: "BiteClub - Eat Together",
     type: "website",
     locale: "en_US",
     images: [
@@ -44,20 +44,20 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "BiteClub - Build Your Cooking Identity",
+        alt: "BiteClub - Eat Together",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BiteClub - Build Your Cooking Identity",
+    title: "BiteClub - Eat Together",
     description:
-      "The social cooking app for home cooks. Build your profile, track your journey, and share what you cook with friends.",
+      "The public social cooking app for home cooks. Build your profile, track your journey, and share what you cook with friends.",
     images: ["/og-image.png"],
   },
-  applicationName: "BiteClub",
+  applicationName: "BiteClub - Eat Together",
   appleWebApp: {
-    title: "BiteClub",
+    title: "BiteClub - Eat Together",
   },
   other: {
     "apple-itunes-app": "app-id=6748471652",
@@ -85,9 +85,9 @@ const jsonLd = {
     },
     {
       "@type": "SoftwareApplication",
-      name: "BiteClub",
+      name: "BiteClub - Eat Together",
       description:
-        "The cooking identity app. Build your cooking profile, share recipes, and track your journey as a home cook.",
+        "The public social cooking app for home cooks. Build your cooking profile, share recipes, and track your journey as a home cook.",
       applicationCategory: "LifestyleApplication",
       operatingSystem: "iOS, Android",
       url: "https://biteclub.fun",
@@ -145,9 +145,9 @@ const jsonLd = {
     },
     {
       "@type": "WebPage",
-      name: "BiteClub - Build Your Cooking Identity",
+      name: "BiteClub - Eat Together",
       description:
-        "BiteClub is the cooking identity app for home cooks. Build your profile, track your journey, and share recipes with friends.",
+        "BiteClub - Eat Together is the public social cooking app for home cooks. Build your profile, track your journey, and share recipes with friends.",
       url: "https://biteclub.fun",
       speakable: {
         "@type": "SpeakableSpecification",

@@ -6,6 +6,7 @@ import { ChevronDown, Users, BookOpen, Camera, TrendingUp, Heart, Menu, X, ChefH
 export default function Page() {
   const [scrollY, setScrollY] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const appStoreUrl = 'https://apps.apple.com/app/id6748471652'
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
@@ -65,7 +66,7 @@ export default function Page() {
             <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
             <a href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">About</a>
             <a href="#join" className="text-gray-600 hover:text-gray-900 transition-colors">Get Started</a>
-            <a href="https://apps.apple.com/app/id6748471652" target="_blank" rel="noopener noreferrer" className="px-6 py-2.5 text-white rounded-full font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: '#c71c39' }}>
+            <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="px-6 py-2.5 text-white rounded-full font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: '#c71c39' }}>
               Get the App
             </a>
           </div>
@@ -85,7 +86,7 @@ export default function Page() {
             <a href="#features" className="block py-2 text-gray-600">Features</a>
             <a href="#about" className="block py-2 text-gray-600">About</a>
             <a href="#join" className="block py-2 text-gray-600">Get Started</a>
-            <a href="https://apps.apple.com/app/id6748471652" target="_blank" rel="noopener noreferrer" className="block w-full px-6 py-3 text-white rounded-full font-semibold text-center" style={{ backgroundColor: '#c71c39' }}>
+            <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="block w-full px-6 py-3 text-white rounded-full font-semibold text-center" style={{ backgroundColor: '#c71c39' }}>
               Get the App
             </a>
           </div>
@@ -97,7 +98,7 @@ export default function Page() {
         <div className="max-w-7xl mx-auto text-center">
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-full mb-8 border border-gray-200">
             <ChefHat className="w-4 h-4" style={{ color: '#c71c39' }} />
-            <span className="text-sm font-semibold" style={{ color: '#3D352E' }}>Your Cooking. Your Story. Your Community.</span>
+            <span className="text-sm font-semibold" style={{ color: '#3D352E' }}>Official App Store name: BiteClub - Eat Together</span>
           </div>
 
           <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight" style={{ color: '#3D352E' }}>
@@ -107,18 +108,22 @@ export default function Page() {
           </h1>
 
           <p className="text-xl lg:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            BiteClub gives you a relationship with your cooking. Like Strava for running or Goodreads for reading, BiteClub is where you build a living record of who you are as a cook.
+            BiteClub - Eat Together is a public social cooking app for home cooks. Like Strava for running or Goodreads for reading, BiteClub is where you build a living record of who you are as a cook.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <button className="group px-8 py-4 text-white rounded-full font-semibold text-lg hover:opacity-90 transition-opacity flex items-center justify-center" style={{ backgroundColor: '#c71c39' }}>
+            <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="group px-8 py-4 text-white rounded-full font-semibold text-lg hover:opacity-90 transition-opacity flex items-center justify-center" style={{ backgroundColor: '#c71c39' }}>
               Start Your Profile
               <Camera className="ml-2 w-5 h-5" />
-            </button>
-            <button className="px-8 py-4 bg-gray-100 rounded-full font-semibold text-lg hover:bg-gray-200 transition-all border border-gray-200" style={{ color: '#3D352E' }}>
+            </a>
+            <a href="#about" className="px-8 py-4 bg-gray-100 rounded-full font-semibold text-lg hover:bg-gray-200 transition-all border border-gray-200" style={{ color: '#3D352E' }}>
               See How It Works
-            </button>
+            </a>
           </div>
+
+          <p className="text-sm text-gray-500 max-w-2xl mx-auto">
+            This website, Privacy Policy, and Terms of Service apply to the publicly available consumer app listed on the App Store as <strong>BiteClub - Eat Together</strong>.
+          </p>
 
           <div className="mt-12">
             <ChevronDown className="w-8 h-8 mx-auto text-gray-400" />
@@ -245,16 +250,16 @@ export default function Page() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <button className="px-8 py-4 text-white rounded-full font-semibold text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#c71c39' }}>
+              <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="px-8 py-4 text-white rounded-full font-semibold text-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#c71c39' }}>
                 Get Started
-              </button>
-              <button className="px-8 py-4 bg-gray-100 rounded-full font-semibold text-lg hover:bg-gray-200 transition-all border border-gray-200" style={{ color: '#3D352E' }}>
+              </a>
+              <a href="#features" className="px-8 py-4 bg-gray-100 rounded-full font-semibold text-lg hover:bg-gray-200 transition-all border border-gray-200" style={{ color: '#3D352E' }}>
                 Learn More
-              </button>
+              </a>
             </div>
 
             <p className="text-sm text-gray-500">
-              Available on iOS and Android
+              Public app listing: BiteClub - Eat Together
             </p>
           </div>
         </div>
@@ -303,7 +308,7 @@ export default function Page() {
             Join BiteClub and build a relationship with your cooking.
           </p>
 
-          <a href="https://apps.apple.com/app/id6748471652" target="_blank" rel="noopener noreferrer" className="px-10 py-4 bg-white rounded-full font-semibold text-lg hover:bg-gray-100 transition-all flex items-center justify-center mx-auto" style={{ color: '#c71c39' }}>
+          <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="px-10 py-4 bg-white rounded-full font-semibold text-lg hover:bg-gray-100 transition-all flex items-center justify-center mx-auto" style={{ color: '#c71c39' }}>
             Get the App
             <Camera className="ml-2 w-5 h-5" />
           </a>
@@ -321,7 +326,7 @@ export default function Page() {
                 </div>
                 <span className="font-bold" style={{ color: '#3D352E' }}>BiteClub</span>
               </div>
-              <p className="text-gray-600 text-sm">Your cooking identity. Your community.</p>
+              <p className="text-gray-600 text-sm">Your cooking identity. Your community. Public app listing: BiteClub - Eat Together.</p>
             </div>
 
             <div>

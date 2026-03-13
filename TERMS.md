@@ -1,8 +1,8 @@
-## BiteClub Terms of Service
+## BiteClub - Eat Together Terms of Service
 
 Last updated: August 18, 2025
 
-These Terms of Service ("Terms") govern your access to and use of the BiteClub mobile application and related services (the "Service"). By using the Service, you agree to these Terms.
+These Terms of Service ("Terms") govern your access to and use of BiteClub - Eat Together (the "App"), the public consumer mobile application operated under the BiteClub brand, and related services (the "Service"). By using the Service, you agree to these Terms.
 
 ### 1. Eligibility
 
@@ -75,8 +75,7 @@ If you downloaded the App from Apple’s App Store, your use of the App is also 
 
 For questions about these Terms, contact us at:
 
-BiteClub
+BiteClub - Eat Together
 wejarrard@gmail.com
 +1 (608) 772‑8104
-
 

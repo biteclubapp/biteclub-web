@@ -1,8 +1,8 @@
-## BiteClub Privacy Policy
+## BiteClub - Eat Together Privacy Policy
 
 Last updated: August 18, 2025
 
-This Privacy Policy explains how BiteClub collects, uses, discloses, and safeguards your information when you use our mobile application (the "App"). If you do not agree with this policy, please do not use the App.
+This Privacy Policy applies to BiteClub - Eat Together (the "App"), the public consumer mobile application operated under the BiteClub brand. It explains how BiteClub collects, uses, discloses, and safeguards your information. If you do not agree with this policy, please do not use the App.
 
 ### Summary for App Store Privacy
 
@@ -82,6 +82,6 @@ We may update this Policy from time to time. We will update the “Last updated�
 
 If you have questions or requests about this Policy, please contact:
 
-BiteClub
+BiteClub - Eat Together
 wejarrard@gmail.com
 +1 (608) 772‑8104
