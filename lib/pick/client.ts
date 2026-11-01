@@ -2,6 +2,7 @@
 // the RPC rate limits key on the caller's IP (cf-connecting-ip), so server-side calls would put
 // every voter in one bucket (Guard, #516; spec D6: no poll data in SSR).
 import type { PickPollResponse, PickVoteResponse } from './logic';
+import { PICK_PHOTO_HOST } from './headers';
 
 const VOTER_KEY = 'pick:voter_id:v1';
 const MEDIA_API = (process.env.NEXT_PUBLIC_MEDIA_API_URL || 'https://biteclub-media-api.biteclub.workers.dev').replace(/\/+$/, '');
@@ -72,7 +73,8 @@ export async function signPhotos(items: { media_id: string; recipe_id: string }[
     const json = (await res.json()) as { signedUrls?: { media_id: string; recipe_id?: string; signedUrl?: string }[] };
     const rows = Array.isArray(json?.signedUrls) ? json.signedUrls : [];
     for (const r of rows) {
-      if (r.signedUrl && /^https:\/\//.test(r.signedUrl)) out.set(`${r.recipe_id}:${r.media_id}`, r.signedUrl);
+      // Only the CSP's img-src host (lib/pick/headers.ts); anything else would just be blocked, so show no photo.
+      if (r.signedUrl && r.signedUrl.startsWith(`${PICK_PHOTO_HOST}/`)) out.set(`${r.recipe_id}:${r.media_id}`, r.signedUrl);
     }
   } catch {
     // No photo is a designed state.

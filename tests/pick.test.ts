@@ -115,6 +115,10 @@ test('/pick/* security headers', () => {
   assert.equal(headers.get('X-Frame-Options'), 'DENY');
   const csp = headers.get('Content-Security-Policy')!;
   assert.match(csp, /frame-ancestors 'none'/);
+  // Guard P3: images only from self (favicon) and Cloudflare Images (signed photos); no blanket https:, data: or blob:.
+  assert.match(csp, /(^|; )img-src 'self' https:\/\/imagedelivery\.net(;|$)/);
+  const imgSrc = csp.split('; ').find(d => d.startsWith('img-src '))!;
+  assert.deepEqual(imgSrc.split(' ').slice(1), ["'self'", 'https://imagedelivery.net']);
   assert.match(csp, /connect-src 'self' https:\/\/abc\.supabase\.co https:\/\/biteclub-media-api\.biteclub\.workers\.dev https:\/\/us\.i\.posthog\.com/);
   assert.doesNotMatch(csp, /unsafe-eval/);
   assert.match(pickContentSecurityPolicy({}, true), /unsafe-eval/);

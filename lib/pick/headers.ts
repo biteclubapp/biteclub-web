@@ -4,6 +4,9 @@
 
 export type Header = { key: string; value: string };
 
+/** The only host signed pick photos come from (Cloudflare Images delivery). */
+export const PICK_PHOTO_HOST = 'https://imagedelivery.net';
+
 const origin = (url: string | undefined): string | null => {
   try {
     return url ? new URL(url).origin : null;
@@ -14,7 +17,7 @@ const origin = (url: string | undefined): string | null => {
 
 /**
  * A CSP that fits the page: Next's inline bootstrap scripts and styles ('unsafe-inline'; 'unsafe-eval' only for
- * `next dev`), self-hosted next/font files, signed https photo URLs, and fetches to Supabase (the two poll RPCs),
+ * `next dev`), self-hosted next/font files, signed photo URLs on imagedelivery.net, and fetches to Supabase (the two poll RPCs),
  * the media API (guest photo signing) and PostHog (capture).
  */
 export function pickContentSecurityPolicy(env: Record<string, string | undefined>, dev = false): string {
@@ -28,8 +31,10 @@ export function pickContentSecurityPolicy(env: Record<string, string | undefined
     "default-src 'self'",
     `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ''}`,
     "style-src 'self' 'unsafe-inline'",
-    // Signed photo URLs are https-only (PickClient/client.ts check it); their host comes from the media API.
-    "img-src 'self' data: blob: https:",
+    // Photos are media-api /media/guest/sign-urls results, which are always Cloudflare Images signed URLs on
+    // https://imagedelivery.net/<hash>/<id>/public?exp=…&sig=… (media-api signImageUrl). 'self' covers the favicon.
+    // No data:/blob: images on this page. Pinning the host limits image-URL exfiltration (Guard P3, biteclub-web#3).
+    `img-src 'self' ${PICK_PHOTO_HOST}`,
     "font-src 'self' data:",
     `connect-src ${[...new Set(connect)].join(' ')}${dev ? ' ws: wss:' : ''}`,
     "object-src 'none'",
