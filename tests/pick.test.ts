@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  afterVote, COPY, headline, isPickToken, pickCt, pickVariant, resultRows, senderLine,
+  afterVote, COPY, headline, NOT_FOUND_CT, isPickToken, pickCt, pickVariant, resultRows, senderLine,
   showInstallButton, storeUrl, timeLabel, viewFor, votesLabel, type PickPollPublic,
 } from '../lib/pick/logic.ts';
 
@@ -87,4 +87,11 @@ test('vote statuses (P3)', () => {
 test('install button hidden on Android', () => {
   assert.equal(showInstallButton('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'), true);
   assert.equal(showInstallButton('Mozilla/5.0 (Linux; Android 14; Pixel 8)'), false);
+});
+
+test('not-found store link uses an arm-less ct within the 30-char limit', () => {
+  assert.equal(NOT_FOUND_CT, 'share_decide_notfound');
+  assert.ok(NOT_FOUND_CT.length <= 30);
+  assert.ok(!/_[ab]$/.test(NOT_FOUND_CT));
+  assert.match(storeUrl(NOT_FOUND_CT), /ct=share_decide_notfound&mt=8$/);
 });

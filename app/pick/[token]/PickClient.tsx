@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { capture } from '@/lib/pick/analytics';
 import { castVote, getPoll, signPhotos, voterId } from '@/lib/pick/client';
 import {
-  afterVote, COPY, CTA_COPY, headline, isPickToken, pickCt, pickVariant, resultRows, senderLine,
+  afterVote, COPY, CTA_COPY, NOT_FOUND_CT, headline, isPickToken, pickCt, pickVariant, resultRows, senderLine,
   showInstallButton, storeUrl, timeLabel, viewFor, votesLabel,
   type PickOption, type PickPollPublic, type ViewState,
 } from '@/lib/pick/logic';
@@ -107,7 +107,8 @@ export default function PickClient({ token }: { token: string }) {
     void signPhotos(items).then(setPhotos);
   }, [poll]);
 
-  const ct = poll ? pickCt(poll, linkCt.current) : null;
+  // No poll (not_found): a fallback ct with no arm, and button A's copy.
+  const ct = poll ? pickCt(poll, linkCt.current) : NOT_FOUND_CT;
   const variant = poll ? pickVariant(poll.poll_id) : 'a';
   const photoFor = (o: PickOption) => (o.recipe_id && o.photo_url ? photos.get(`${o.recipe_id}:${o.photo_url}`) ?? null : null);
 
@@ -152,8 +153,9 @@ export default function PickClient({ token }: { token: string }) {
         <>
           <a
             href={storeUrl(ct)}
-            onClick={() => poll && capture('web:store_button_tapped', {
-              page: 'pick', ct, share_id: poll.poll_id, placement: 'inline', variant, is_guest: true, event_version: EVENT_VERSION,
+            onClick={() => capture('web:store_button_tapped', {
+              page: 'pick', ct, share_id: poll?.poll_id ?? null, placement: 'inline', variant: poll ? variant : null,
+              is_guest: true, event_version: EVENT_VERSION,
             })}
             className="flex items-center justify-center w-full h-[52px] rounded-[12px] text-white text-[16px] font-semibold"
             style={{ background: ACCENT }}
@@ -227,8 +229,15 @@ export default function PickClient({ token }: { token: string }) {
 
         {screen.kind === 'result' && poll && (
           <>
-            <p className="mt-6 text-[14px] text-[#666666]">{COPY.yourVote}</p>
-            {myOption?.title && <h1 className="mt-1 text-[20px] leading-[26px] font-semibold">{myOption.title}</h1>}
+            {/* Only a recorded vote gets "Your vote's in" (a full poll rejects new votes: my_position stays null). */}
+            {myOption ? (
+              <>
+                <p className="mt-6 text-[14px] text-[#666666]">{COPY.yourVote}</p>
+                {myOption.title && <h1 className="mt-1 text-[20px] leading-[26px] font-semibold">{myOption.title}</h1>}
+              </>
+            ) : (
+              <h1 className="mt-6 text-[28px] leading-[34px] font-bold">{headline(poll.deck)}</h1>
+            )}
             {screen.note && <p className="mt-2 text-[16px] text-[#666666]">{screen.note}</p>}
             {results}
             {install}

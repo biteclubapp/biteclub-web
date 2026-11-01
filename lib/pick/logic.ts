@@ -65,6 +65,9 @@ export function storeUrl(ct: string): string {
   return `https://apps.apple.com/app/apple-store/id${APP_STORE_ID}?pt=${APP_STORE_PT}&ct=${encodeURIComponent(ct)}&mt=8`;
 }
 
+/** Store-link ct when no poll loaded (bad, expired or revoked link): no arm, so it never skews the A/B. */
+export const NOT_FOUND_CT = 'share_decide_notfound';
+
 export const CTA_COPY = { a: 'Try BiteClub', b: 'Never decide dinner again' } as const;
 
 export function headline(deck: PickDeck): string {
