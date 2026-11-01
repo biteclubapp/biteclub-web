@@ -110,6 +110,8 @@ export type ViewState =
 
 export const COPY = {
   notFound: "This link doesn't work. Ask for a new one.",
+  loadFailed: "Couldn't load this poll.",
+  retry: 'Try again',
   voteFailed: "Couldn't send your vote. Tap again.",
   closed: "Voting's closed.",
   full: 'This poll is full.',

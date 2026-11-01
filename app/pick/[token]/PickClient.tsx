@@ -14,7 +14,7 @@ const ACCENT = '#c71c39';
 const INK = '#3D352E';
 const EVENT_VERSION = 'v1';
 
-type Screen = { kind: 'loading' } | ViewState | { kind: 'owner' };
+type Screen = { kind: 'loading' } | { kind: 'load_failed' } | ViewState | { kind: 'owner' };
 
 function msSincePollCreated(poll: PickPollPublic): number | null {
   const created = Date.parse(poll.closes_at) - 72 * 3600 * 1000;
@@ -70,6 +70,7 @@ export default function PickClient({ token }: { token: string }) {
   const [canInstall, setCanInstall] = useState(true);
   const loadedAt = useRef(Date.now());
   const linkCt = useRef<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     setCanInstall(showInstallButton(navigator.userAgent));
@@ -80,11 +81,13 @@ export default function PickClient({ token }: { token: string }) {
       return;
     }
     let cancelled = false;
+    setScreen({ kind: 'loading' });
     void getPoll(token, voterId()).then(res => {
       if (cancelled) return;
       if ('error' in res) {
-        setScreen({ kind: 'not_found' });
-        capture('$pageview', { page: 'pick', state: 'not_found', error: res.error, is_guest: true, event_version: EVENT_VERSION });
+        // Network, 429 or server trouble isn't a dead link: offer a retry (Codex P2).
+        setScreen({ kind: 'load_failed' });
+        capture('$pageview', { page: 'pick', state: 'load_failed', error: res.error, is_guest: true, event_version: EVENT_VERSION });
         return;
       }
       const view = viewFor(res);
@@ -96,7 +99,7 @@ export default function PickClient({ token }: { token: string }) {
       capture('$pageview', { page: 'pick', ...props, is_guest: true, event_version: EVENT_VERSION });
     });
     return () => { cancelled = true; };
-  }, [token]);
+  }, [token, attempt]);
 
   // Photos sign only when the payload carries a recipe id (see lib/pick/client.ts).
   useEffect(() => {
@@ -196,6 +199,20 @@ export default function PickClient({ token }: { token: string }) {
           <div className="mt-6 flex flex-col gap-2" aria-busy>
             {[0, 1, 2].map(i => <div key={i} className="h-[120px] rounded-[12px] bg-[#F5F5F5]" />)}
           </div>
+        )}
+
+        {screen.kind === 'load_failed' && (
+          <>
+            <p className="mt-6 text-[20px] font-semibold">{COPY.loadFailed}</p>
+            <button
+              type="button"
+              onClick={() => setAttempt(n => n + 1)}
+              className="mt-4 w-full h-[52px] rounded-[12px] border text-[16px] font-semibold"
+              style={{ borderColor: '#E5E5E5', color: INK }}
+            >
+              {COPY.retry}
+            </button>
+          </>
         )}
 
         {screen.kind === 'not_found' && (
