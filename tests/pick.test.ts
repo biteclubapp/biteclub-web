@@ -2,8 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   afterVote, COPY, headline, NOT_FOUND_CT, isPickToken, pickCt, pickVariant, resultRows, senderLine,
-  showInstallButton, storeUrl, timeLabel, viewFor, votesLabel, type PickPollPublic,
+  showInstallButton, storeUrl, timeLabel, viewFor, voteFailedError, votesLabel, type PickPollPublic,
 } from '../lib/pick/logic.ts';
+import { pickContentSecurityPolicy, pickSecurityHeaders } from '../lib/pick/headers.ts';
 
 const opt = (position: number, extra: Partial<PickPollPublic['options'][number]> = {}) => ({
   position, title: `Dish ${position}`, total_time_min: 30, photo_url: null, media_id: null, available: true, ...extra,
@@ -94,4 +95,27 @@ test('not-found store link uses an arm-less ct within the 30-char limit', () => 
   assert.ok(NOT_FOUND_CT.length <= 30);
   assert.ok(!/_[ab]$/.test(NOT_FOUND_CT));
   assert.match(storeUrl(NOT_FOUND_CT), /ct=share_decide_notfound&mt=8$/);
+});
+
+test('pick:vote_failed error matches the app set (failed, not network; every non-ok status)', () => {
+  assert.equal(voteFailedError({ error: 'network' }), 'failed');
+  assert.equal(voteFailedError({ error: 'rate_limited' }), 'rate_limited');
+  for (const status of ['closed', 'full', 'owner', 'not_found', 'invalid'] as const) {
+    assert.equal(voteFailedError({ status }), status);
+  }
+  assert.equal(voteFailedError({ status: 'ok' }), null);
+});
+
+test('/pick/* security headers', () => {
+  const headers = new Map(pickSecurityHeaders({ NEXT_PUBLIC_SUPABASE_URL: 'https://abc.supabase.co/' }).map(h => [h.key, h.value]));
+  assert.equal(headers.get('Referrer-Policy'), 'no-referrer');
+  assert.match(headers.get('Cache-Control')!, /no-store/);
+  assert.match(headers.get('X-Robots-Tag')!, /noindex/);
+  assert.equal(headers.get('X-Content-Type-Options'), 'nosniff');
+  assert.equal(headers.get('X-Frame-Options'), 'DENY');
+  const csp = headers.get('Content-Security-Policy')!;
+  assert.match(csp, /frame-ancestors 'none'/);
+  assert.match(csp, /connect-src 'self' https:\/\/abc\.supabase\.co https:\/\/biteclub-media-api\.biteclub\.workers\.dev https:\/\/us\.i\.posthog\.com/);
+  assert.doesNotMatch(csp, /unsafe-eval/);
+  assert.match(pickContentSecurityPolicy({}, true), /unsafe-eval/);
 });

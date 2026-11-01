@@ -11,8 +11,11 @@ export type PickOption = {
   photo_url: string | null;
   media_id: string | null;
   available: boolean;
-  /** Not in today's public payload; used for guest photo signing when a later migration adds it. */
-  recipe_id?: string;
+  /**
+   * Guest photo signing needs it. Public payloads carry it for available options once migration 20261101210351
+   * (biteclub#549) is live; an unavailable option carries null. Null is treated exactly like missing.
+   */
+  recipe_id?: string | null;
 };
 
 export type PickPollPublic = {
@@ -33,6 +36,15 @@ export type PickNotFound = { state: 'not_found' };
 export type PickPollResponse = PickPollPublic | PickNotFound;
 export type PickVoteStatus = 'ok' | 'closed' | 'full' | 'owner' | 'not_found' | 'invalid';
 export type PickVoteResponse = (PickPollPublic | PickNotFound) & { status: PickVoteStatus; recipe_id?: string };
+
+/** pick:vote_failed's `error`: the same set as the app's event (biteclub lib/posthog/events.ts). */
+export type PickVoteFailedError = Exclude<PickVoteStatus, 'ok'> | 'rate_limited' | 'failed';
+
+/** The vote_failed error for a cast_pick_vote result, or null for 'ok'. A network or server error is 'failed'. */
+export function voteFailedError(res: { error: 'rate_limited' | 'network' } | { status: PickVoteStatus }): PickVoteFailedError | null {
+  if ('error' in res) return res.error === 'rate_limited' ? 'rate_limited' : 'failed';
+  return res.status === 'ok' ? null : res.status;
+}
 
 /** The share token from create_pick_poll: 24 random bytes, base64url, no padding. */
 export const PICK_TOKEN_RE = /^[A-Za-z0-9_-]{32}$/;

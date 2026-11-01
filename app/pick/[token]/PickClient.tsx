@@ -1,12 +1,12 @@
 'use client';
 
-import { Check } from 'lucide-react';
+import { CircleCheck } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { capture } from '@/lib/pick/analytics';
 import { castVote, getPoll, signPhotos, voterId } from '@/lib/pick/client';
 import {
   afterVote, COPY, CTA_COPY, NOT_FOUND_CT, headline, isPickToken, pickCt, pickVariant, resultRows, senderLine,
-  showInstallButton, storeUrl, timeLabel, viewFor, votesLabel,
+  showInstallButton, storeUrl, timeLabel, viewFor, voteFailedError, votesLabel,
   type PickOption, type PickPollPublic, type ViewState,
 } from '@/lib/pick/logic';
 
@@ -38,7 +38,7 @@ function OptionRow({ option, url, selected, onTap, disabled, children }: {
   const content = (
     <>
       <Photo option={option} url={unavailable ? null : url} />
-      <span className="flex-1 min-w-0 text-left">
+      <span className="flex-1 min-w-0 text-left px-3 py-3">
         {unavailable ? (
           <span className="block text-[16px] text-[#666666]">{COPY.unavailable}</span>
         ) : (
@@ -47,10 +47,10 @@ function OptionRow({ option, url, selected, onTap, disabled, children }: {
         {!unavailable && time && <span className="block mt-1 text-[14px] text-[#666666]">{time}</span>}
         {children}
       </span>
-      {selected && <Check aria-hidden className="flex-none w-6 h-6" style={{ color: ACCENT }} />}
+      {selected && <CircleCheck aria-hidden className="flex-none w-6 h-6 self-center mr-3" style={{ color: ACCENT }} />}
     </>
   );
-  const cls = `w-full min-h-[120px] flex items-center gap-4 p-0 pr-4 rounded-[12px] bg-white overflow-hidden ${selected ? 'border-2' : 'border'}`;
+  const cls = `w-full min-h-[120px] flex items-start rounded-[12px] bg-white overflow-hidden ${selected ? 'border-2' : 'border'}`;
   const style = { borderColor: selected ? ACCENT : '#E5E5E5' };
   if (!onTap || unavailable) return <div className={cls} style={style}>{content}</div>;
   return (
@@ -124,15 +124,16 @@ export default function PickClient({ token }: { token: string }) {
     setSending(true);
     const res = await castVote(token, position, voter);
     setSending(false);
+    // Same pick:vote_failed error set as the app (Analyst, #3): every non-ok status, rate_limited, or failed.
+    const failed = voteFailedError(res);
+    if (failed) capture('pick:vote_failed', { error: failed, poll_id: poll.poll_id, deck: poll.deck, is_guest: true, event_version: EVENT_VERSION });
     if ('error' in res) {
       setVoteError(true);
-      capture('pick:vote_failed', { error: res.error, poll_id: poll.poll_id, deck: poll.deck, is_guest: true, event_version: EVENT_VERSION });
       return;
     }
     const next = afterVote(res.status);
     if (next.kind === 'retry') {
       setVoteError(true);
-      capture('pick:vote_failed', { error: res.status, poll_id: poll.poll_id, deck: poll.deck, is_guest: true, event_version: EVENT_VERSION });
       return;
     }
     if (res.state !== 'not_found') setPoll(res);
@@ -180,7 +181,7 @@ export default function PickClient({ token }: { token: string }) {
             <span className={isTop ? 'font-semibold' : 'text-[#666666]'} style={isTop ? { color: INK } : undefined}>{votesLabel(count)}</span>
             {isTop && <span className="font-semibold" style={{ color: ACCENT }}>Top pick</span>}
           </span>
-          <span className="block mt-2 h-2 rounded bg-[#F5F5F5] overflow-hidden">
+          <span className="block mt-2 h-1 rounded bg-[#F5F5F5] overflow-hidden">
             <span className="block h-full rounded" style={{ width: `${total ? Math.round((count / total) * 100) : 0}%`, background: isTop ? ACCENT : '#E5E5E5' }} />
           </span>
         </OptionRow>
@@ -192,7 +193,7 @@ export default function PickClient({ token }: { token: string }) {
 
   return (
     <main className="min-h-screen bg-white" style={{ color: INK }}>
-      <div className="max-w-[420px] mx-auto px-4 pt-4 pb-6">
+      <div className="max-w-[420px] mx-auto px-6 pt-4 pb-6">
         <div className="text-[14px] font-semibold">BiteClub</div>
 
         {screen.kind === 'loading' && (
