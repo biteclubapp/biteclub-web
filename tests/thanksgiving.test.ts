@@ -31,8 +31,10 @@ test('Thanksgiving route, www canonical and sitemap inclusion preserve pick excl
 test('store attribution defaults and incoming allowlist apply to links and pageviews', () => {
   assert.equal(campaignCt({}, THANKSGIVING_CT), 'web_thanksgiving');
   assert.equal(storeUrl(campaignCt({}, THANKSGIVING_CT)), 'https://apps.apple.com/app/apple-store/id6748471652?pt=127915368&ct=web_thanksgiving&mt=8');
-  assert.equal(campaignCt({ ct: 'share_recipe_202611', utm_campaign: 'web_home' }, THANKSGIVING_CT), 'share_recipe_202611');
-  assert.equal(campaignCt({ ct: 'invalid', utm_campaign: 'web_club' }, THANKSGIVING_CT), 'web_club');
+  assert.equal(campaignCt({ ct: 'share_recipe_202611', utm_source: 'web', utm_campaign: 'home' }, THANKSGIVING_CT), 'share_recipe_202611');
+  assert.equal(campaignCt({ ct: 'invalid', utm_source: 'web', utm_campaign: 'club' }, THANKSGIVING_CT), 'web_club');
+  assert.equal(campaignCt({ ct: 'invalid', utm_campaign: 'web_club' }, THANKSGIVING_CT), THANKSGIVING_CT);
+  assert.equal(campaignCt({ ct: 'pin_recipe' }, THANKSGIVING_CT), 'pin_recipe');
   assert.equal(campaignCt({ ct: 'invalid' }, THANKSGIVING_CT), THANKSGIVING_CT);
   assert.equal(new URL(storeUrl(campaignCt({ ct: 'web_recipe' }, THANKSGIVING_CT))).searchParams.get('ct'), 'web_recipe');
   assert.equal(pageCt(THANKSGIVING_PATH), THANKSGIVING_CT);
