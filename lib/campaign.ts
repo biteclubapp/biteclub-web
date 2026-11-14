@@ -88,13 +88,24 @@ export function sanitizeAnalyticsUrl(value: string): string | null {
   }
 }
 
+/** Referrers retain only their HTTP(S) origin. */
+function referrerOrigin(value: unknown): string {
+  if (typeof value !== 'string') return '$direct';
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.origin : '$direct';
+  } catch {
+    return '$direct';
+  }
+}
+
 /** Sanitize custom properties too, including URLs nested in objects or arrays. */
 function sanitizeAnalyticsProperty(value: unknown): unknown {
   if (typeof value === 'string') return sanitizeAnalyticsUrl(value) ?? value;
   if (Array.isArray(value)) return value.map(sanitizeAnalyticsProperty);
   if (value && typeof value === 'object') {
     return Object.fromEntries(Object.entries(value).map(([key, val]) =>
-      [key, key === '$referring_domain' ? val : sanitizeAnalyticsProperty(val)]));
+      [key, key === '$referrer' ? referrerOrigin(val) : key === '$referring_domain' ? val : sanitizeAnalyticsProperty(val)]));
   }
   return value;
 }
@@ -119,14 +130,13 @@ export function buildCapture(input: CaptureInput): CaptureBody | null {
     $current_url: input.href,
     $host: url.host,
     $pathname: url.pathname,
-    $referrer: sanitizeAnalyticsUrl(input.referrer) ?? '$direct',
+    $referrer: referrerOrigin(input.referrer),
     $referring_domain: referringDomain(input.referrer),
     $process_person_profile: false,
     $lib: 'biteclub-web',
     ...input.properties,
   };
-  properties.$referrer = typeof properties.$referrer === 'string'
-    ? sanitizeAnalyticsUrl(properties.$referrer) ?? '$direct' : '$direct';
+  properties.$referrer = referrerOrigin(properties.$referrer);
   properties.$referring_domain = sanitizeAnalyticsUrl(input.referrer) ? referringDomain(input.referrer) : '$direct';
   return {
     api_key: input.key,

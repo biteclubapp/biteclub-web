@@ -9,15 +9,11 @@ export function siteUrl(path = '/'): string {
   return `${SITE_ORIGIN}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
-/** @kitchen (publish runbook). Matched by id as well as username so a lookup failure can't drop it. */
+/** @kitchen (publish runbook). */
 export const KITCHEN_USER_ID = 'd226f6a9-6be3-46e0-a3a8-3af034ce71bb';
 
-/**
- * Authors whose recipes are indexed and listed in the sitemap, in sitemap order. Recipes by anyone else still render
- * for people holding the link, but noindex, without canonical or JSON-LD: there is no per-recipe "public" flag we can
- * rely on yet, and a link share is not consent to be in Google. Will's username is `will` (Analyst exclusions / Team metrics).
- */
-export const INDEXABLE_AUTHOR_USERNAMES: readonly string[] = ['kitchen', 'will'];
+export const WILL_USER_ID = 'e74a8033-1d4f-49c7-906c-3af9141e48d7';
+export const INDEXABLE_AUTHOR_IDS = [KITCHEN_USER_ID, WILL_USER_ID] as const;
 
 /** The recipe fields these helpers read. Extra columns (is_deleted, visibility…) are read defensively. */
 export type RecipeRow = {
@@ -34,9 +30,42 @@ export type RecipeRow = {
   user_id?: string | null;
   profiles?: { username?: string | null; full_name?: string | null } | null;
   recipe_media?: Array<{ media_uri: string; media_type: string | null }> | null;
-  original_recipes?: { original_recipe_media?: Array<{ media_uri: string; media_type: string | null }> | null } | null;
+  original_recipes?: { user_id?: string | null; original_recipe_media?: Array<{ media_uri: string; media_type: string | null }> | null } | null;
   [column: string]: unknown;
 };
+
+export type LineageCatalog = Map<string, RecipeRow> | Record<string, RecipeRow>;
+const LINEAGE_LINKS = [
+  ['parent_recipe_id', 'parent', 'parent_recipe'],
+  ['copied_from_recipe_id', 'copied_from', 'copied_from_recipe'],
+  ['branched_from_recipe_id', 'branched_from', 'branched_from_recipe'],
+] as const;
+
+/** Attached __lineage catalog supplies ancestors beyond the embedded first hop. Unknown ownership fails closed. */
+export function sameAuthorLineage(row: RecipeRow): boolean {
+  if (typeof row.user_id !== 'string' || !row.user_id) return false;
+  const catalog = row.__lineage as LineageCatalog | undefined;
+  const active = new Set<string>();
+  function walk(node: RecipeRow, depth: number): boolean {
+    if (depth > 20 || node.user_id !== row.user_id || !node.id || active.has(node.id)) return false;
+    if (node.original_recipe_id != null) {
+      const owner = node.original_recipes?.user_id;
+      if (owner !== null && owner !== row.user_id) return false;
+    }
+    active.add(node.id);
+    for (const [pointer, short, long] of LINEAGE_LINKS) {
+      const id = node[pointer];
+      if (id == null) continue;
+      if (typeof id !== 'string' || !id) return false;
+      const nested = (node[short] ?? node[long]) as RecipeRow | undefined;
+      const ancestor = nested ?? (catalog instanceof Map ? catalog.get(id) : catalog?.[id]);
+      if (!ancestor || ancestor.id !== id || !walk(ancestor, depth + 1)) return false;
+    }
+    active.delete(node.id);
+    return true;
+  }
+  return walk(row, 0);
+}
 
 export type RecipeVisibility = 'gone' | 'unlisted' | 'indexable';
 
@@ -46,17 +75,15 @@ export type RecipeVisibility = 'gone' | 'unlisted' | 'indexable';
  * indexable: self-canonical, Recipe JSON-LD, stable cover image, sitemap.
  * Columns are checked only when present, so a schema without them can't throw; anything ambiguous fails closed.
  */
-export function recipeVisibility(row: RecipeRow | null | undefined, authorIds: readonly string[] = [KITCHEN_USER_ID]): RecipeVisibility {
+export function recipeVisibility(row: RecipeRow | null | undefined, authorIds: readonly string[] = INDEXABLE_AUTHOR_IDS): RecipeVisibility {
   if (!row || typeof row.id !== 'string' || !row.id) return 'gone';
   if (row.is_deleted === true || (row.deleted_at != null && row.deleted_at !== '')) return 'gone';
   if (row.is_public === false || row.is_private === true || row.is_draft === true) return 'unlisted';
   if (typeof row.visibility === 'string' && row.visibility !== 'public') return 'unlisted';
   if (row.status === 'draft' || row.published === false) return 'unlisted';
   if (!row.title || !String(row.title).trim()) return 'unlisted';
-  const byId = typeof row.user_id === 'string' && (row.user_id === KITCHEN_USER_ID || authorIds.includes(row.user_id));
-  const username = row.profiles?.username ?? null;
-  const byName = typeof username === 'string' && INDEXABLE_AUTHOR_USERNAMES.includes(username);
-  return byId || byName ? 'indexable' : 'unlisted';
+  return typeof row.user_id === 'string' && authorIds.includes(row.user_id) && sameAuthorLineage(row)
+    ? 'indexable' : 'unlisted';
 }
 
 export const recipePath = (id: string): string => `/recipe/${encodeURIComponent(id)}`;
@@ -73,9 +100,11 @@ export function isImageId(value: unknown): value is string {
     && !value.includes('//');
 }
 
-/** The recipe's own first image, else the original recipe's (copied recipes). Videos are skipped. */
+/** Own first image, else an explicitly null-owner or same-author original image. Videos are skipped. */
 export function recipeImageId(row: RecipeRow): string | null {
-  const media = [...(row.recipe_media ?? []), ...(row.original_recipes?.original_recipe_media ?? [])];
+  const owner = row.original_recipes?.user_id;
+  const safeOriginal = owner === null || (typeof row.user_id === 'string' && owner === row.user_id);
+  const media = [...(row.recipe_media ?? []), ...(safeOriginal ? row.original_recipes?.original_recipe_media ?? [] : [])];
   const first = media.find(m => !m.media_type || m.media_type.startsWith('image'));
   return first && isImageId(first.media_uri) ? first.media_uri : null;
 }

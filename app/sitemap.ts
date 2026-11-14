@@ -1,35 +1,20 @@
 import type { MetadataRoute } from "next";
-import { INDEXABLE_AUTHOR_USERNAMES, KITCHEN_USER_ID, recipeSitemapRows, staticSitemapRows, type RecipeRow } from "@/lib/seo";
-import { supabase } from "@/lib/supabase";
+import { INDEXABLE_AUTHOR_IDS, recipeSitemapRows, staticSitemapRows, type RecipeRow } from "@/lib/seo";
+import { attachRecipeLineage, supabase } from "@/lib/supabase";
 
 // Rebuilt at most hourly. Recipe rows are filtered by lib/seo.ts recipeVisibility: indexable authors only, never
 // soft-deleted/private/draft rows, and never /pick, club or invite URLs.
 export const revalidate = 3600;
 
-async function indexableAuthorIds(): Promise<string[]> {
-  const ids = [KITCHEN_USER_ID];
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, username")
-    .in("username", [...INDEXABLE_AUTHOR_USERNAMES]);
-  if (error) {
-    console.error("Sitemap author lookup failed:", error.code);
-    return ids;
-  }
-  // Keep INDEXABLE_AUTHOR_USERNAMES order (@kitchen first).
-  for (const name of INDEXABLE_AUTHOR_USERNAMES) {
-    const row = (data ?? []).find((p) => p.username === name);
-    if (row && !ids.includes(row.id)) ids.push(row.id);
-  }
-  return ids;
-}
-
 async function recipeRows(): Promise<MetadataRoute.Sitemap> {
   try {
-    const authorIds = await indexableAuthorIds();
+    const authorIds = [...INDEXABLE_AUTHOR_IDS];
+    // Only columns that exist on public.recipes today, plus original_recipes.user_id.
+    // recipeVisibility also reads deleted_at/is_public/visibility/status/published when present; those
+    // columns are not in the current schema, so they are omitted rather than breaking the query.
     const { data, error } = await supabase
       .from("recipes")
-      .select("*")
+      .select("id,title,user_id,created_at,updated_at,is_deleted,parent_recipe_id,copied_from_recipe_id,branched_from_recipe_id,original_recipe_id,original_recipes:original_recipe_id(user_id)")
       .in("user_id", authorIds)
       .order("created_at", { ascending: false })
       .limit(5000);
@@ -37,7 +22,9 @@ async function recipeRows(): Promise<MetadataRoute.Sitemap> {
       console.error("Sitemap recipe query failed:", error.code);
       return [];
     }
-    return recipeSitemapRows((data ?? []) as RecipeRow[], authorIds);
+    const rows = (data ?? []) as RecipeRow[];
+    await attachRecipeLineage(rows);
+    return recipeSitemapRows(rows, authorIds);
   } catch {
     console.error("Sitemap recipe query failed");
     return [];
