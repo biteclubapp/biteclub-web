@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { SITE_ORIGIN } from "@/lib/seo";
+import PageviewTracker from "./PageviewTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +29,8 @@ export const metadata: Metadata = {
     "cooking tracker",
     "strava for cooking",
   ],
-  metadataBase: new URL("https://biteclub.fun"),
+  metadataBase: new URL(SITE_ORIGIN),
+  // Home canonical (www). Recipe pages override it: self-canonical when indexable, none otherwise (BIT-597).
   alternates: {
     canonical: "/",
   },
@@ -35,7 +38,7 @@ export const metadata: Metadata = {
     title: "BiteClub - Eat Together",
     description:
       "The public social cooking app for home cooks. Build your profile, track your journey, and share what you cook with friends.",
-    url: "https://biteclub.fun",
+    url: SITE_ORIGIN,
     siteName: "BiteClub - Eat Together",
     type: "website",
     locale: "en_US",
@@ -70,8 +73,8 @@ const jsonLd = {
     {
       "@type": "Organization",
       name: "BiteClub",
-      url: "https://biteclub.fun",
-      logo: "https://biteclub.fun/favicon.ico",
+      url: SITE_ORIGIN,
+      logo: `${SITE_ORIGIN}/favicon.ico`,
       description:
         "BiteClub is the social cooking app that helps home cooks build their cooking identity, track their journey, and connect with friends through food.",
       contactPoint: {
@@ -90,7 +93,7 @@ const jsonLd = {
         "The public social cooking app for home cooks. Build your cooking profile, share recipes, and track your journey as a home cook.",
       applicationCategory: "LifestyleApplication",
       operatingSystem: "iOS, Android",
-      url: "https://biteclub.fun",
+      url: SITE_ORIGIN,
       downloadUrl: "https://apps.apple.com/app/id6748471652",
       offers: {
         "@type": "Offer",
@@ -148,7 +151,7 @@ const jsonLd = {
       name: "BiteClub - Eat Together",
       description:
         "BiteClub - Eat Together is the public social cooking app for home cooks. Build your profile, track your journey, and share recipes with friends.",
-      url: "https://biteclub.fun",
+      url: SITE_ORIGIN,
       speakable: {
         "@type": "SpeakableSpecification",
         cssSelector: ["h1", ".text-xl.lg\\:text-2xl"],
@@ -174,6 +177,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <PageviewTracker />
       </body>
     </html>
   );

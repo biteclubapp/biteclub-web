@@ -2,10 +2,11 @@
 
 import { X } from 'lucide-react';
 import { useState } from 'react';
+import StoreLink from './StoreLink';
 
-const APP_STORE_URL = 'https://apps.apple.com/app/id6748471652';
+type Props = { storeHref: string; ct: string; shareId: string | null };
 
-export default function StickyBanner() {
+export default function StickyBanner({ storeHref, ct, shareId }: Props) {
   const [isVisible, setIsVisible] = useState(true);
 
   if (!isVisible) return null;
@@ -16,12 +17,15 @@ export default function StickyBanner() {
         <h3 className="text-base font-bold flex-1" style={{ color: '#3D352E' }}>
           Want to see more recipes like this?
         </h3>
-        <a 
-          href={APP_STORE_URL}
+        <StoreLink
+          href={storeHref}
+          ct={ct}
+          shareId={shareId}
+          placement="banner"
           className="px-5 py-2.5 bg-[#c71c39] text-white rounded-full font-semibold text-sm hover:opacity-90 transition-opacity whitespace-nowrap"
         >
           Get the App
-        </a>
+        </StoreLink>
         <button
           onClick={() => setIsVisible(false)}
           className="p-1 hover:bg-gray-100 rounded-full transition-colors"

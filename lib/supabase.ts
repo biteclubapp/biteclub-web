@@ -44,6 +44,49 @@ export interface Recipe {
     media_uri: string;
     media_type: string | null;
   }>;
+  original_recipes?: {
+    original_recipe_media?: Array<{
+      media_uri: string;
+      media_type: string | null;
+    }> | null;
+  } | null;
+  // Other columns (is_deleted, …) come through `*` and are read by lib/seo.ts recipeVisibility.
+  [column: string]: unknown;
+}
+
+/**
+ * A recipe row with author and media, via the anon client (RLS applies). Callers must still gate on
+ * lib/seo.ts recipeVisibility: this returns soft-deleted and non-public rows too. Never logs the row.
+ */
+export async function fetchRecipe(id: string): Promise<Recipe | null> {
+  const { data, error } = await supabase
+    .from('recipes')
+    .select(`
+      *,
+      profiles!recipes_user_id_fkey (
+        username,
+        full_name,
+        avatar_url
+      ),
+      recipe_media (
+        media_uri,
+        media_type
+      ),
+      original_recipes:original_recipe_id (
+        original_recipe_media (
+          media_uri,
+          media_type
+        )
+      )
+    `)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Recipe fetch failed:', error.code);
+    return null;
+  }
+  return (data as Recipe | null) ?? null;
 }
 
 // Type for club data

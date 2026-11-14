@@ -1,92 +1,64 @@
-import { Recipe, supabase } from '@/lib/supabase';
+import { fetchRecipe } from '@/lib/supabase';
 import { signImageUrl } from '@/lib/imageUrl';
+import { campaignCt, shareId as parseShareId } from '@/lib/campaign';
+import { storeUrl } from '@/lib/pick/logic';
+import {
+  FALLBACK_IMAGE_URL, ingredientLines, instructionSteps, jsonLdScript, recipeCanonical, recipeImageId,
+  recipeJsonLd, recipeSchemaImage, recipeVisibility, type RecipeRow,
+} from '@/lib/seo';
 import { ChefHat, Clock, Users } from 'lucide-react';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 import StickyBanner from './StickyBanner';
+import StoreLink from './StoreLink';
 
-const APP_STORE_URL = 'https://apps.apple.com/app/id6748471652';
-
-async function getRecipe(id: string): Promise<Recipe | null> {
-  console.log('🔍 Fetching recipe:', id);
-  
-  const { data, error } = await supabase
-    .from('recipes')
-    .select(`
-      *,
-      profiles!recipes_user_id_fkey (
-        username,
-        full_name,
-        avatar_url
-      ),
-      recipe_media (
-        media_uri,
-        media_type
-      ),
-      original_recipes:original_recipe_id (
-        original_recipe_media (
-          media_uri,
-          media_type
-        )
-      )
-    `)
-    .eq('id', id)
-    .single();
-
-  if (error) {
-    console.error('❌ Supabase error:', JSON.stringify(error, null, 2));
-    return null;
-  }
-  
-  if (!data) {
-    console.log('❌ No recipe found for ID:', id);
-    return null;
-  }
-
-  console.log('✅ Recipe found:', data.title);
-  console.log('📊 Full recipe data:', JSON.stringify(data, null, 2));
-  console.log('🖼️ Recipe media:', data.recipe_media);
-  console.log('🖼️ Original recipe media:', (data as any).original_recipes?.original_recipe_media);
-  console.log('📝 Instructions:', data.instructions);
-  console.log('🥗 Ingredients:', data.ingredients_text);
-  
-  return data as Recipe;
-}
+// One fetch per request for generateMetadata + the page.
+const getRecipe = cache(fetchRecipe);
 
 // Generate Open Graph metadata for social sharing
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const recipe = await getRecipe(id);
+  const visibility = recipeVisibility(recipe as RecipeRow | null);
 
-  if (!recipe) {
+  if (!recipe || visibility === 'gone') {
     return {
       title: 'Recipe not found | BiteClub',
+      robots: { index: false, follow: false },
+      alternates: { canonical: null },
     };
   }
 
+  const indexable = visibility === 'indexable';
   const author = recipe.profiles?.username || recipe.profiles?.full_name || 'BiteClub User';
   const title = `${recipe.title} | BiteClub`;
   const description = recipe.description || `Check out this recipe from ${author} on BiteClub`;
+  const canonical = recipeCanonical(recipe.id);
 
-  // Generate signed URL for private Cloudflare Images
-  // Fallback to original recipe media if this recipe has no media
-  const imageUri = recipe.recipe_media?.[0]?.media_uri
-    || (recipe as any).original_recipes?.original_recipe_media?.[0]?.media_uri;
-
-  let imageUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/tomato.png`;
-  if (imageUri) {
-    try {
-      imageUrl = await signImageUrl(imageUri);
-    } catch (error) {
-      console.error('Failed to sign image URL:', error);
-      // Fall back to tomato.png on error
+  // Indexable recipes use the stable same-origin cover (Google recrawls it later). Link-only recipes keep the
+  // 1-hour signed URL, which is fine for a share preview fetched right away.
+  let imageUrl = FALLBACK_IMAGE_URL;
+  if (indexable) {
+    imageUrl = recipeSchemaImage(recipe as RecipeRow);
+  } else {
+    const imageId = recipeImageId(recipe as RecipeRow);
+    if (imageId) {
+      try {
+        imageUrl = await signImageUrl(imageId);
+      } catch {
+        console.error('Failed to sign recipe OG image');
+      }
     }
   }
 
   return {
     title,
     description,
+    // Only indexable recipes canonicalize to themselves; the rest are noindex and must not inherit the home canonical.
+    alternates: { canonical: indexable ? canonical : null },
+    robots: indexable ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
       title: recipe.title,
       description,
@@ -98,7 +70,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
           alt: recipe.title,
         },
       ],
-      url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://biteclub.fun'}/recipe/${id}`,
+      url: canonical,
       type: 'website',
     },
     twitter: {
@@ -111,49 +83,51 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 
-export default async function RecipePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const recipe = await getRecipe(id);
+type SearchParams = Record<string, string | string[] | undefined>;
 
-  if (!recipe) {
+export default async function RecipePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<SearchParams>;
+}) {
+  const { id } = await params;
+  const query = await searchParams;
+  const recipe = await getRecipe(id);
+  const visibility = recipeVisibility(recipe as RecipeRow | null);
+
+  if (!recipe || visibility === 'gone') {
     notFound();
   }
 
-  // Generate signed URL for private Cloudflare images
-  // Fallback to original recipe media if this recipe has no media
-  const imageUri = recipe.recipe_media?.[0]?.media_uri
-    || (recipe as any).original_recipes?.original_recipe_media?.[0]?.media_uri;
-
+  // On-page photo stays a 1-hour signed URL (no proxy bandwidth); schema/OG use the stable cover route.
+  const imageId = recipeImageId(recipe as RecipeRow);
   let imageUrl: string | null = null;
-  if (imageUri) {
+  if (imageId) {
     try {
-      imageUrl = await signImageUrl(imageUri);
-    } catch (error) {
-      console.error('Failed to sign image URL for display:', error);
-      // imageUrl remains null, image won't render
+      imageUrl = await signImageUrl(imageId);
+    } catch {
+      console.error('Failed to sign recipe image');
     }
   }
 
   const author = recipe.profiles?.username || recipe.profiles?.full_name || 'BiteClub User';
-  
-  // Debug logging
-  console.log('🔍 [Render] Recipe ID:', id);
-  console.log('🔍 [Render] Image URL:', imageUrl);
-  console.log('🔍 [Render] Recipe media array:', recipe.recipe_media);
-  console.log('🔍 [Render] Instructions:', recipe.instructions);
-  console.log('🔍 [Render] Instructions type:', typeof recipe.instructions);
-  console.log('🔍 [Render] Instructions is array:', Array.isArray(recipe.instructions));
-  console.log('🔍 [Render] Ingredients:', recipe.ingredients_text);
-  console.log('🔍 [Render] Rendering checks:', {
-    hasImage: !!imageUrl,
-    hasInstructions: !!(recipe.instructions && Array.isArray(recipe.instructions) && recipe.instructions.length > 0),
-    hasIngredients: !!(recipe.ingredients_text && recipe.ingredients_text.length > 0),
-    instructionsCount: Array.isArray(recipe.instructions) ? recipe.instructions.length : 0,
-    ingredientsCount: recipe.ingredients_text?.length || 0,
-  });
+  const ingredients = ingredientLines(recipe.ingredients_text);
+  const steps = instructionSteps(recipe.instructions);
+
+  const ct = campaignCt(query, 'web_recipe');
+  const shareId = parseShareId(query.s);
+  const storeHref = storeUrl(ct);
 
   return (
     <div className="min-h-screen bg-white">
+      {visibility === 'indexable' && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(recipeJsonLd(recipe as RecipeRow)) }}
+        />
+      )}
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -173,12 +147,15 @@ export default async function RecipePage({ params }: { params: Promise<{ id: str
               className="h-7 w-auto"
             />
           </div>
-          <a 
-            href={APP_STORE_URL}
+          <StoreLink
+            href={storeHref}
+            ct={ct}
+            shareId={shareId}
+            placement="header"
             className="px-5 py-2.5 bg-[#c71c39] text-white rounded-full font-semibold text-sm hover:opacity-90 transition-opacity"
           >
             Get the App
-          </a>
+          </StoreLink>
         </div>
       </header>
 
@@ -319,59 +296,36 @@ export default async function RecipePage({ params }: { params: Promise<{ id: str
         {/* Ingredients & Instructions - Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Ingredients */}
-          {recipe.ingredients_text && recipe.ingredients_text.length > 0 && (
+          {ingredients.length > 0 && (
             <div className="p-5 bg-gray-50 rounded-xl">
               <h2 className="text-xl font-bold mb-3" style={{ color: '#3D352E' }}>Ingredients</h2>
               <ul className="space-y-2">
-                {recipe.ingredients_text.map((ingredient, index) => {
-                  // Handle ingredients that might be stored as JSON objects
-                  let displayText = ingredient;
-                  if (typeof ingredient === 'string' && ingredient.startsWith('{') && ingredient.includes('"text"')) {
-                    try {
-                      const parsed = JSON.parse(ingredient);
-                      displayText = parsed.text || ingredient;
-                    } catch {
-                      displayText = ingredient;
-                    }
-                  }
-                  
-                  return (
-                    <li key={index} className="flex items-start">
-                      <span className="mr-3" style={{ color: '#3D352E' }}>•</span>
-                      <span className="text-base" style={{ color: '#3D352E' }}>{displayText}</span>
-                    </li>
-                  );
-                })}
+                {/* Same unwrapping as the Recipe JSON-LD (lib/seo.ts ingredientLines) */}
+                {ingredients.map((ingredient, index) => (
+                  <li key={index} className="flex items-start">
+                    <span className="mr-3" style={{ color: '#3D352E' }}>•</span>
+                    <span className="text-base" style={{ color: '#3D352E' }}>{ingredient}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           )}
 
           {/* Instructions */}
-          {recipe.instructions && (
+          {steps.length > 0 && (
             <div className="p-5 bg-gray-50 rounded-xl">
               <h2 className="text-xl font-bold mb-4" style={{ color: '#3D352E' }}>Instructions</h2>
               <ol className="space-y-3">
-                {(() => {
-                  // Handle instructions as either string or array
-                  const instructionsList = typeof recipe.instructions === 'string'
-                    ? recipe.instructions.split('\n').filter(line => line.trim())
-                    : Array.isArray(recipe.instructions)
-                    ? recipe.instructions
-                    : [];
-
-                  return instructionsList.map((instruction: any, index: number) => (
-                    <li key={index} className="flex items-start">
-                      <span className="flex-shrink-0 w-7 h-7 bg-[#c71c39] rounded-full flex items-center justify-center text-white font-semibold text-sm mr-3 mt-0.5">
-                        {index + 1}
-                      </span>
-                      <span className="text-base leading-relaxed pt-0.5" style={{ color: '#3D352E' }}>
-                        {typeof instruction === 'string' 
-                          ? instruction 
-                          : (instruction?.text || String(instruction?.step || ''))}
-                      </span>
-                    </li>
-                  ));
-                })()}
+                {steps.map((step, index) => (
+                  <li key={index} className="flex items-start">
+                    <span className="flex-shrink-0 w-7 h-7 bg-[#c71c39] rounded-full flex items-center justify-center text-white font-semibold text-sm mr-3 mt-0.5">
+                      {index + 1}
+                    </span>
+                    <span className="text-base leading-relaxed pt-0.5" style={{ color: '#3D352E' }}>
+                      {step}
+                    </span>
+                  </li>
+                ))}
               </ol>
             </div>
           )}
@@ -380,7 +334,7 @@ export default async function RecipePage({ params }: { params: Promise<{ id: str
       </main>
 
       {/* Sticky Bottom Banner */}
-      <StickyBanner />
+      <StickyBanner storeHref={storeHref} ct={ct} shareId={shareId} />
 
       {/* Footer */}
       <footer className="border-t border-gray-200 mt-16 px-6 py-6 bg-white mb-20">
