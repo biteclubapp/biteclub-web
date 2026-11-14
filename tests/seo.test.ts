@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   FALLBACK_IMAGE_URL, KITCHEN_USER_ID, WILL_USER_ID, INDEXABLE_AUTHOR_IDS, sameAuthorLineage, SITE_ORIGIN, ingredientLines, instructionSteps, isImageId, isoDuration,
-  jsonLdScript, recipeCanonical, recipeCoverUrl, recipeImageId, recipeJsonLd, recipeSitemapRows, recipeVisibility,
+  jsonLdScript, recipeCanonical, recipeCoverUrl, recipeImageId, recipeJsonLd, recipeSchemaImage, recipeSitemapRows, recipeVisibility,
   siteUrl, staticSitemapRows, type RecipeRow,
 } from '../lib/seo.ts';
 import { buildCapture, campaignCt, isAllowedCt, referringDomain, sanitizeAnalyticsUrl, shareId } from '../lib/campaign.ts';
@@ -113,7 +113,7 @@ test('JSON-LD script escapes < so recipe text cannot close the tag', () => {
   assert.equal(JSON.parse(out).name, '</script><script>alert(1)</script>');
 });
 
-test('stable image URL: same-origin cover for public photos, tomato fallback, no unsafe ids', () => {
+test('stable image URL: same-origin cover even without a photo, no unsafe ids', () => {
   assert.equal(recipeCoverUrl(ID), `https://www.biteclub.fun/recipe/${ID}/cover`);
   assert.equal(recipeImageId(recipe()), 'abc123-image');
   // Falls back to the original recipe's media for copies; skips videos.
@@ -123,7 +123,8 @@ test('stable image URL: same-origin cover for public photos, tomato fallback, no
   })), 'orig-img');
   const noPhoto = recipe({ recipe_media: [] });
   assert.equal(recipeImageId(noPhoto), null);
-  assert.deepEqual(recipeJsonLd(noPhoto).image, [FALLBACK_IMAGE_URL]);
+  assert.deepEqual(recipeJsonLd(noPhoto).image, [recipeCoverUrl(ID)]);
+  assert.equal(recipeSchemaImage(noPhoto), recipeCoverUrl(ID));
   assert.equal(FALLBACK_IMAGE_URL, 'https://www.biteclub.fun/tomato.png');
   for (const bad of ['../secret', 'https://evil.example/x.png', 'a//b', '', '/abs', 'x?sig=1']) {
     assert.equal(isImageId(bad), false, bad);

@@ -1,3 +1,4 @@
+import { resolveRecipeImageId } from '@/lib/coverImage';
 import { fetchRecipe } from '@/lib/supabase';
 import { signImageUrl } from '@/lib/imageUrl';
 import { campaignCt, shareId as parseShareId } from '@/lib/campaign';
@@ -102,7 +103,9 @@ export default async function RecipePage({
   }
 
   // On-page photo stays a 1-hour signed URL (no proxy bandwidth); schema/OG use the stable cover route.
-  const imageId = recipeImageId(recipe as RecipeRow);
+  const imageId = visibility === 'indexable'
+    ? await resolveRecipeImageId(recipe as RecipeRow)
+    : recipeImageId(recipe as RecipeRow);
   let imageUrl: string | null = null;
   if (imageId) {
     try {

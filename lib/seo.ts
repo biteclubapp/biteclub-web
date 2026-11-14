@@ -100,6 +100,11 @@ export function isImageId(value: unknown): value is string {
     && !value.includes('//');
 }
 
+/** Accept only a successful cover RPC's path-safe image id. */
+export function acceptedCoverImageId(data: unknown, error: unknown): string | null {
+  return error != null || !isImageId(data) ? null : data;
+}
+
 /** Own first image, else an explicitly null-owner or same-author original image. Videos are skipped. */
 export function recipeImageId(row: RecipeRow): string | null {
   const owner = row.original_recipes?.user_id;
@@ -109,9 +114,9 @@ export function recipeImageId(row: RecipeRow): string | null {
   return first && isImageId(first.media_uri) ? first.media_uri : null;
 }
 
-/** Schema/OG image for an indexable recipe: the stable cover route, or the tomato when it has no photo. */
+/** Schema/OG image for an indexable recipe: the stable cover route, which resolves the current photo or placeholder. */
 export function recipeSchemaImage(row: RecipeRow): string {
-  return recipeImageId(row) ? recipeCoverUrl(row.id) : FALLBACK_IMAGE_URL;
+  return recipeCoverUrl(row.id);
 }
 
 /** Ingredient strings as displayed: JSON-ish `{"text": …}` items are unwrapped, blanks dropped. */
