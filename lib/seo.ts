@@ -67,6 +67,11 @@ export function sameAuthorLineage(row: RecipeRow): boolean {
   return walk(row, 0);
 }
 
+/** Only allowlisted authors can be indexable, so only their rows need the lineage walk; others are unlisted without it. */
+export function needsRecipeLineage(row: RecipeRow | null | undefined, authorIds: readonly string[] = INDEXABLE_AUTHOR_IDS): boolean {
+  return typeof row?.user_id === 'string' && authorIds.includes(row.user_id);
+}
+
 export type RecipeVisibility = 'gone' | 'unlisted' | 'indexable';
 
 /**
@@ -82,7 +87,7 @@ export function recipeVisibility(row: RecipeRow | null | undefined, authorIds: r
   if (typeof row.visibility === 'string' && row.visibility !== 'public') return 'unlisted';
   if (row.status === 'draft' || row.published === false) return 'unlisted';
   if (!row.title || !String(row.title).trim()) return 'unlisted';
-  return typeof row.user_id === 'string' && authorIds.includes(row.user_id) && sameAuthorLineage(row)
+  return needsRecipeLineage(row, authorIds) && sameAuthorLineage(row)
     ? 'indexable' : 'unlisted';
 }
 
@@ -100,10 +105,14 @@ export function isImageId(value: unknown): value is string {
     && !value.includes('//');
 }
 
-/** Own first image, else an explicitly null-owner or same-author original image. Videos are skipped. */
-export function recipeImageId(row: RecipeRow): string | null {
+/**
+ * Own first image, else the original recipe's image. Videos are skipped. By default (indexable output: cover route,
+ * JSON-LD, indexable page) the original's image counts only when its owner is explicitly null or the same author.
+ * Link-only pages pass `sameAuthorMedia: false` to keep the pre-BIT-597 photo for ordinary copies.
+ */
+export function recipeImageId(row: RecipeRow, { sameAuthorMedia = true }: { sameAuthorMedia?: boolean } = {}): string | null {
   const owner = row.original_recipes?.user_id;
-  const safeOriginal = owner === null || (typeof row.user_id === 'string' && owner === row.user_id);
+  const safeOriginal = !sameAuthorMedia || owner === null || (typeof row.user_id === 'string' && owner === row.user_id);
   const media = [...(row.recipe_media ?? []), ...(safeOriginal ? row.original_recipes?.original_recipe_media ?? [] : [])];
   const first = media.find(m => !m.media_type || m.media_type.startsWith('image'));
   return first && isImageId(first.media_uri) ? first.media_uri : null;

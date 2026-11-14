@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   FALLBACK_IMAGE_URL, KITCHEN_USER_ID, WILL_USER_ID, INDEXABLE_AUTHOR_IDS, sameAuthorLineage, SITE_ORIGIN, ingredientLines, instructionSteps, isImageId, isoDuration,
-  jsonLdScript, recipeCanonical, recipeCoverUrl, recipeImageId, recipeJsonLd, recipeSitemapRows, recipeVisibility,
+  jsonLdScript, needsRecipeLineage, recipeCanonical, recipeCoverUrl, recipeImageId, recipeJsonLd, recipeSitemapRows, recipeVisibility,
   siteUrl, staticSitemapRows, type RecipeRow,
 } from '../lib/seo.ts';
 import { buildCapture, campaignCt, isAllowedCt, referringDomain, sanitizeAnalyticsUrl, shareId } from '../lib/campaign.ts';
@@ -202,8 +202,20 @@ test('campaign placements and UTM derivation respect precedence and page fallbac
 });
 
 test('analytics URL sanitizer keeps allowed parameters in order and drops credentials and hashes', () => {
-  assert.equal(sanitizeAnalyticsUrl('https://example.com/path?utm_future=x&email=ada@example.com&ct=web_home&s=123&utm_future=y#secret'),
-    'https://example.com/path?utm_future=x&ct=web_home&s=123&utm_future=y');
+  assert.equal(sanitizeAnalyticsUrl('https://example.com/path?utm_source=x&email=ada@example.com&ct=web_home&s=aB3dE6gH&utm_source=y#secret'),
+    'https://example.com/path?utm_source=x&ct=web_home&s=aB3dE6gH&utm_source=y');
+  // Unknown utm_* keys are dropped.
+  assert.equal(sanitizeAnalyticsUrl('https://example.com/path?utm_future=x&utm_token=abc&utm_medium=social'),
+    'https://example.com/path?utm_medium=social');
+  // Email-looking UTM values are dropped; long ones are capped at 200.
+  assert.equal(sanitizeAnalyticsUrl('https://example.com/path?utm_content=ada@example.com&utm_campaign=home'),
+    'https://example.com/path?utm_campaign=home');
+  assert.equal(sanitizeAnalyticsUrl(`https://example.com/path?utm_term=${'a'.repeat(300)}`),
+    `https://example.com/path?utm_term=${'a'.repeat(200)}`);
+  // ct must pass the allowlist and s the share-id check.
+  for (const junk of ['ct=ada@example.com', 'ct=evil', 's=123', 's=ada@example.com', 's=aB3dE6gH9']) {
+    assert.equal(sanitizeAnalyticsUrl(`https://example.com/path?${junk}`), 'https://example.com/path', junk);
+  }
   assert.equal(sanitizeAnalyticsUrl('https://user:password@example.com/path?invite=secret#hash'), 'https://example.com/path');
   for (const value of ['', 'ada@example.com', '/recipe/path', 'ftp://example.com/path']) {
     assert.equal(sanitizeAnalyticsUrl(value), null);
@@ -233,6 +245,10 @@ test('capture sanitizes current, referring and custom URLs before returning the 
   const { api_key, ...capture } = body;
   assert.ok(api_key);
   assert.doesNotMatch(JSON.stringify(capture), /invite=|private-code|ada|secret/);
+  const emailUtm = buildCapture({ ...input, href: 'https://www.biteclub.fun/recipe/123?utm_source=ig&utm_content=ada@example.com' });
+  assert.equal(emailUtm?.properties.utm_source, 'ig');
+  assert.equal('utm_content' in (emailUtm?.properties ?? {}), false);
+  assert.equal(emailUtm?.properties.$current_url, 'https://www.biteclub.fun/recipe/123?utm_source=ig');
   for (const referrer of ['', 'ada@example.com', 'not a url', 'mailto:ada@example.com']) {
     const direct = buildCapture({ ...input, referrer });
     assert.equal(direct?.properties.$referrer, '$direct');
@@ -364,6 +380,33 @@ test('original media requires explicit null or same-author ownership; own image 
       user_id === null || user_id === KITCHEN_USER_ID ? 'original-image' : null);
     assert.equal(recipeImageId(recipe({ original_recipes })), 'abc123-image');
   }
+});
+
+test('link-only pages keep the original photo; indexable output keeps the same-author rule', () => {
+  const original_recipes = { user_id: KITCHEN_USER_ID, original_recipe_media: [{ media_uri: 'original-image', media_type: 'image' }] };
+  // An ordinary user's copy of someone else's recipe: unlisted, photo restored for the share page and OG.
+  const copy = recipe({ user_id: OTHER_USER, recipe_media: [], original_recipe_id: 'orig', original_recipes });
+  assert.equal(recipeVisibility(copy), 'unlisted');
+  assert.equal(recipeImageId(copy, { sameAuthorMedia: false }), 'original-image');
+  // Indexable output (cover route, JSON-LD, indexable page) still refuses a foreign original's media.
+  assert.equal(recipeImageId(copy), null);
+  assert.equal(recipeImageId(copy, { sameAuthorMedia: true }), null);
+  const foreignOriginal = recipe({ recipe_media: [], original_recipes: { ...original_recipes, user_id: OTHER_USER } });
+  assert.equal(recipeImageId(foreignOriginal), null);
+  assert.deepEqual(recipeJsonLd(foreignOriginal).image, [FALLBACK_IMAGE_URL]);
+  // Videos are still skipped on link-only pages.
+  assert.equal(recipeImageId(recipe({ user_id: OTHER_USER, recipe_media: [{ media_uri: 'vid', media_type: 'video' }] }), { sameAuthorMedia: false }), null);
+});
+
+test('lineage walk only for allowlisted authors; everyone else is unlisted without it', () => {
+  for (const user_id of INDEXABLE_AUTHOR_IDS) assert.equal(needsRecipeLineage(recipe({ user_id })), true);
+  for (const user_id of [OTHER_USER, null, undefined, '']) assert.equal(needsRecipeLineage(recipe({ user_id })), false);
+  assert.equal(needsRecipeLineage(null), false);
+  // A skipped walk (no __lineage) fails closed for other authors, even with clean or no ancestry.
+  assert.equal(recipeVisibility(recipe({ user_id: OTHER_USER })), 'unlisted');
+  assert.equal(recipeVisibility(recipe({ user_id: OTHER_USER, parent_recipe_id: 'p' })), 'unlisted');
+  // An allowlisted row missing its lineage still fails closed rather than passing.
+  assert.equal(recipeVisibility(recipe({ parent_recipe_id: 'p' })), 'unlisted');
 });
 
 test('club capture strips invite codes and referrer credentials, paths and queries', () => {

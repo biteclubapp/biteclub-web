@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (indexable) {
     imageUrl = recipeSchemaImage(recipe as RecipeRow);
   } else {
-    const imageId = recipeImageId(recipe as RecipeRow);
+    const imageId = recipeImageId(recipe as RecipeRow, { sameAuthorMedia: false });
     if (imageId) {
       try {
         imageUrl = await signImageUrl(imageId);
@@ -102,7 +102,8 @@ export default async function RecipePage({
   }
 
   // On-page photo stays a 1-hour signed URL (no proxy bandwidth); schema/OG use the stable cover route.
-  const imageId = recipeImageId(recipe as RecipeRow);
+  // Same-author media rule only for indexable pages; link-only pages keep the original's photo as before.
+  const imageId = recipeImageId(recipe as RecipeRow, { sameAuthorMedia: visibility === 'indexable' });
   let imageUrl: string | null = null;
   if (imageId) {
     try {

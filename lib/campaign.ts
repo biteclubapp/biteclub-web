@@ -72,14 +72,26 @@ export function referringDomain(referrer: string): string {
   }
 }
 
-/** Keep only campaign query parameters on absolute HTTP(S) URLs; never retain credentials or hashes. */
+const isUtmKey = (key: string): boolean => (UTM_KEYS as readonly string[]).includes(key);
+
+/** A UTM value capped at 200 characters, or null when it looks like an email. */
+function utmValue(value: string): string | null {
+  return value.includes('@') ? null : value.slice(0, 200);
+}
+
+/** Origin + path of absolute HTTP(S) URLs, plus only the standard UTM keys, an allowlisted ct and a valid share id. */
 export function sanitizeAnalyticsUrl(value: string): string | null {
   try {
     const url = new URL(value);
     if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
     const kept = new URLSearchParams();
     for (const [key, val] of url.searchParams) {
-      if (key === 'ct' || key === 's' || key.startsWith('utm_')) kept.append(key, val);
+      if (isUtmKey(key)) {
+        const utm = utmValue(val);
+        if (utm) kept.append(key, utm);
+      } else if ((key === 'ct' && isAllowedCt(val)) || (key === 's' && shareId(val))) {
+        kept.append(key, val);
+      }
     }
     const query = kept.toString();
     return `${url.origin}${url.pathname}${query ? `?${query}` : ''}`;
@@ -122,7 +134,10 @@ export function buildCapture(input: CaptureInput): CaptureBody | null {
   if (isPickPath(url.pathname)) return null;
   const query = Object.fromEntries(url.searchParams.entries());
   const utm: Record<string, string> = {};
-  for (const k of UTM_KEYS) if (query[k]) utm[k] = query[k].slice(0, 200);
+  for (const k of UTM_KEYS) {
+    const value = query[k] ? utmValue(query[k]) : null;
+    if (value) utm[k] = value;
+  }
   const properties: Record<string, unknown> = {
     ct: campaignCt(query, pageCt(url.pathname)),
     share_id: shareId(query.s),
