@@ -229,7 +229,7 @@ export function recipeSitemapRows(rows: readonly RecipeRow[], authorIds: readonl
 /** Exact-title @kitchen match only; drafts, private and soft-deleted rows cannot become menu links. */
 export function publishedKitchenRecipe(title: string, rows: readonly RecipeRow[]): RecipeRow | undefined {
   return rows.find(row => row.title === title
-    && (row.user_id === KITCHEN_USER_ID || row.profiles?.username === 'kitchen')
+    && row.user_id === KITCHEN_USER_ID
     && recipeVisibility(row) === 'indexable');
 }
 

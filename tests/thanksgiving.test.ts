@@ -58,7 +58,8 @@ test('unpublished, deleted, private, other-author and non-exact titles have no r
     assert.equal(kitchenRecipeHref(titles[0], [{ ...published, ...extra }]), undefined);
   }
   assert.equal(kitchenRecipeHref(titles[0], [published]), '/recipe/live-recipe');
-  assert.equal(publishedKitchenRecipe(titles[0], [{ ...published, user_id: 'kitchen-profile', profiles: { username: 'kitchen' } }])?.id, published.id);
+  assert.equal(publishedKitchenRecipe(titles[0], [{ ...published, user_id: 'kitchen-profile', profiles: { username: 'kitchen' } }]), undefined);
+  assert.equal(publishedKitchenRecipe(titles[0], [published])?.id, published.id);
   assert.equal(recipeCoverUrl(published.id), 'https://www.biteclub.fun/recipe/live-recipe/cover');
 });
 
