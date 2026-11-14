@@ -5,7 +5,7 @@ import {
   jsonLdScript, recipeCanonical, recipeCoverUrl, recipeImageId, recipeJsonLd, recipeSitemapRows, recipeVisibility,
   siteUrl, staticSitemapRows, type RecipeRow,
 } from '../lib/seo.ts';
-import { buildCapture, campaignCt, isAllowedCt, referringDomain, shareId } from '../lib/campaign.ts';
+import { buildCapture, campaignCt, isAllowedCt, referringDomain, sanitizeAnalyticsUrl, shareId } from '../lib/campaign.ts';
 import { storeUrl } from '../lib/pick/logic.ts';
 
 const ID = '0b6c3c55-4a8e-4b8e-9d3e-2f1f6a7b8c9d';
@@ -175,11 +175,68 @@ test('store URL: allowlisted incoming ct wins, otherwise web_recipe', () => {
   assert.equal(campaignCt({ ct: 'invite_home_202612' }), 'invite_home_202612');
   assert.equal(campaignCt({ ct: 'web_thanksgiving' }), 'web_thanksgiving');
   assert.equal(campaignCt({ ct: ['web_meal', 'web_club'] }), 'web_meal');
-  assert.equal(campaignCt({ utm_campaign: 'web_home' }), 'web_home');
-  assert.equal(campaignCt({ ct: 'evil<script>', utm_campaign: 'share_meal_202611' }), 'share_meal_202611');
-  for (const bad of ['evil', 'share_recipe_202613', 'share_recipe_2026111', 'web_admin', 'share_decide_202611_c', 'SHARE_recipe_202611', 'x'.repeat(41)]) {
+  assert.equal(campaignCt({ utm_campaign: 'web_home' }), 'web_recipe');
+  assert.equal(campaignCt({ ct: 'evil<script>', utm_campaign: 'share_meal_202611' }), 'web_recipe');
+  for (const bad of ['evil', 'share_recipe_202613', 'share_recipe_2026111', 'web_admin', 'share_decide_202611_c', 'SHARE_recipe_202611', 'x'.repeat(31), 'share_decide_202611', 'tt_decide_20261320_a', 'tt_decide_20261132', 'tt_decide_20261100', 'email_abcdefghijklmnop_20261120_a']) {
     assert.equal(isAllowedCt(bad), false, bad);
     assert.equal(campaignCt({ ct: bad }), 'web_recipe');
+  }
+});
+
+test('campaign placements and UTM derivation respect precedence and page fallback', () => {
+  for (const ct of ['tt_decide_20261120_a', 'tt_expa_a', 'tt_expa_b', 'ig_expa_a', 'ig_expa_b',
+    'pin_recipe', 'pin_thanks', 'invite_settings_202611', 'invite_pick_202611',
+    'x_future_20260131', 'yt_chef_20260201_b', 'email_launch_20261201', 'web_thanks_20261120',
+    'pin_thanks_20261120', 'share_future_202611', 'invite_future_202611']) {
+    assert.equal(isAllowedCt(ct), true, ct);
+    assert.equal(campaignCt({ ct }), ct);
+  }
+  assert.equal(campaignCt({ ct: 'pin_thanks' }, 'web_thanksgiving'), 'pin_thanks');
+  assert.equal(campaignCt({}, 'web_thanksgiving'), 'web_thanksgiving');
+  assert.equal(campaignCt({ utm_source: 'ig', utm_campaign: 'decide_20261120_a' }), 'ig_decide_20261120_a');
+  assert.equal(campaignCt({ utm_source: 'web', utm_campaign: 'home' }), 'web_home');
+  assert.equal(campaignCt({ utm_source: [' IG ', 'web'], utm_campaign: [' Decide_20261120_A ', 'home'] }), 'ig_decide_20261120_a');
+  assert.equal(campaignCt({ ct: 'pin_recipe', utm_source: 'web', utm_campaign: 'home' }), 'pin_recipe');
+  assert.equal(campaignCt({ ct: 'evil', utm_source: 'web', utm_campaign: 'home' }), 'web_home');
+  assert.equal(isAllowedCt('invite_abcdefghijklmnop_202611'), true); // Exactly 30 characters.
+});
+
+test('analytics URL sanitizer keeps allowed parameters in order and drops credentials and hashes', () => {
+  assert.equal(sanitizeAnalyticsUrl('https://example.com/path?utm_future=x&email=ada@example.com&ct=web_home&s=123&utm_future=y#secret'),
+    'https://example.com/path?utm_future=x&ct=web_home&s=123&utm_future=y');
+  assert.equal(sanitizeAnalyticsUrl('https://user:password@example.com/path?invite=secret#hash'), 'https://example.com/path');
+  for (const value of ['', 'ada@example.com', '/recipe/path', 'ftp://example.com/path']) {
+    assert.equal(sanitizeAnalyticsUrl(value), null);
+  }
+});
+
+test('capture sanitizes current, referring and custom URLs before returning the body', () => {
+  const input = {
+    key: 'k', event: '$pageview', distinctId: 'mem-1',
+    href: 'https://www.biteclub.fun/recipe/123?ct=web_recipe&invite=private-code&s=aB3dE6gH&email=ada@example.com&utm_source=ig#secret',
+    referrer: 'https://www.google.com/search?q=secret+query&email=ada@example.com',
+    properties: {
+      destination: 'https://example.com/join?invite=private-code&email=ada@example.com&ct=pin_recipe#secret',
+      nested: { urls: ['https://example.com/?email=ada@example.com'] },
+      label: 'plain text', path: '/recipe/123',
+    },
+  };
+  const body = buildCapture(input);
+  assert.ok(body);
+  assert.equal(body.properties.$current_url, 'https://www.biteclub.fun/recipe/123?ct=web_recipe&s=aB3dE6gH&utm_source=ig');
+  assert.equal(body.properties.$referrer, 'https://www.google.com/search');
+  assert.equal(body.properties.$referring_domain, 'www.google.com');
+  assert.equal(body.properties.destination, 'https://example.com/join?ct=pin_recipe');
+  assert.deepEqual(body.properties.nested, { urls: ['https://example.com/'] });
+  assert.equal(body.properties.label, 'plain text');
+  assert.equal(body.properties.path, '/recipe/123');
+  const { api_key, ...capture } = body;
+  assert.ok(api_key);
+  assert.doesNotMatch(JSON.stringify(capture), /invite=|private-code|ada|secret/);
+  for (const referrer of ['', 'ada@example.com', 'not a url', 'mailto:ada@example.com']) {
+    const direct = buildCapture({ ...input, referrer });
+    assert.equal(direct?.properties.$referrer, '$direct');
+    assert.equal(direct?.properties.$referring_domain, '$direct');
   }
 });
 
