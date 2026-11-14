@@ -229,13 +229,25 @@ test('pageview: no-op without a key, skips /pick, cookieless and person-less', (
   assert.equal(buildCapture({ ...input, key: KEY, href: 'https://www.biteclub.fun/' })?.properties.ct, 'web_home');
 });
 
-test('store tap event carries page, ct, share_id, placement', () => {
+test('store tap event carries page, ct, share_id, placement and event_version 1, not is_guest', () => {
+  const props = { page: 'recipe', ct: 'web_recipe', share_id: null, placement: 'header', event_version: 1 };
   const body = buildCapture({
     key: 'k', event: 'web:store_button_tapped', href: `https://www.biteclub.fun/recipe/${ID}`, referrer: '',
-    distinctId: 'mem-1', properties: { page: 'recipe', ct: 'web_recipe', share_id: null, placement: 'header' },
+    distinctId: 'mem-1', properties: props,
   });
   assert.equal(body?.properties.page, 'recipe');
+  assert.equal(body?.properties.ct, 'web_recipe');
+  assert.equal(body?.properties.share_id, null);
   assert.equal(body?.properties.placement, 'header');
+  assert.equal(body?.properties.event_version, 1);
+  assert.equal('is_guest' in (body?.properties ?? {}), false);
+});
+
+test('StoreLink sends event_version 1 and does not set is_guest', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const src = await readFile(new URL('../app/recipe/[id]/StoreLink.tsx', import.meta.url), 'utf8');
+  assert.match(src, /event_version:\s*1/);
+  assert.doesNotMatch(src, /is_guest/);
 });
 
 test('referring domain', () => {
