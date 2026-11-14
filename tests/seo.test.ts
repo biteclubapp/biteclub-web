@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  FALLBACK_IMAGE_URL, KITCHEN_USER_ID, SITE_ORIGIN, ingredientLines, instructionSteps, isImageId, isoDuration,
+  FALLBACK_IMAGE_URL, KITCHEN_USER_ID, WILL_USER_ID, INDEXABLE_AUTHOR_IDS, sameAuthorLineage, SITE_ORIGIN, ingredientLines, instructionSteps, isImageId, isoDuration,
   jsonLdScript, recipeCanonical, recipeCoverUrl, recipeImageId, recipeJsonLd, recipeSitemapRows, recipeVisibility,
   siteUrl, staticSitemapRows, type RecipeRow,
 } from '../lib/seo.ts';
@@ -45,10 +45,10 @@ test('visibility: deleted/missing are gone, private/draft/other authors unlisted
   assert.equal(recipeVisibility(recipe({ user_id: OTHER_USER, profiles: { username: 'someone' } })), 'unlisted');
   assert.equal(recipeVisibility(recipe({ title: '  ' })), 'unlisted');
   assert.equal(recipeVisibility(recipe()), 'indexable');
-  assert.equal(recipeVisibility(recipe({ user_id: OTHER_USER, profiles: { username: 'will' } })), 'indexable');
+  assert.equal(recipeVisibility(recipe({ user_id: OTHER_USER, profiles: { username: 'will' } })), 'unlisted');
   assert.equal(recipeVisibility(recipe({ is_deleted: false, visibility: 'public' })), 'indexable');
-  // By username when the id differs, and by an explicitly passed author id.
-  assert.equal(recipeVisibility(recipe({ user_id: OTHER_USER })), 'indexable');
+  // Only pinned or explicitly passed author ids qualify.
+  assert.equal(recipeVisibility(recipe({ user_id: OTHER_USER })), 'unlisted');
   assert.equal(recipeVisibility(recipe({ user_id: OTHER_USER, profiles: null }), [KITCHEN_USER_ID, OTHER_USER]), 'indexable');
 });
 
@@ -119,7 +119,7 @@ test('stable image URL: same-origin cover for public photos, tomato fallback, no
   // Falls back to the original recipe's media for copies; skips videos.
   assert.equal(recipeImageId(recipe({
     recipe_media: [{ media_uri: 'vid', media_type: 'video' }],
-    original_recipes: { original_recipe_media: [{ media_uri: 'orig-img', media_type: null }] },
+    original_recipes: { user_id: null, original_recipe_media: [{ media_uri: 'orig-img', media_type: null }] },
   })), 'orig-img');
   const noPhoto = recipe({ recipe_media: [] });
   assert.equal(recipeImageId(noPhoto), null);
@@ -224,7 +224,7 @@ test('capture sanitizes current, referring and custom URLs before returning the 
   const body = buildCapture(input);
   assert.ok(body);
   assert.equal(body.properties.$current_url, 'https://www.biteclub.fun/recipe/123?ct=web_recipe&s=aB3dE6gH&utm_source=ig');
-  assert.equal(body.properties.$referrer, 'https://www.google.com/search');
+  assert.equal(body.properties.$referrer, 'https://www.google.com');
   assert.equal(body.properties.$referring_domain, 'www.google.com');
   assert.equal(body.properties.destination, 'https://example.com/join?ct=pin_recipe');
   assert.deepEqual(body.properties.nested, { urls: ['https://example.com/'] });
@@ -320,4 +320,60 @@ test('analytics code never logs (the key cannot reach console output)', async ()
     assert.ok(!/console\./.test(src), `${f} must not log`);
     assert.ok(!/localStorage\.|sessionStorage\.|document\.cookie/.test(src), `${f} must stay cookieless`);
   }
+});
+
+
+test('lineage gates visibility, sitemap and cover for all ancestry paths', () => {
+  assert.deepEqual(INDEXABLE_AUTHOR_IDS, [KITCHEN_USER_ID, WILL_USER_ID]);
+  for (const user_id of INDEXABLE_AUTHOR_IDS) assert.equal(recipeVisibility(recipe({ user_id })), 'indexable');
+  const blocked: RecipeRow[] = [];
+  for (const [pointer, name] of [
+    ['parent_recipe_id', 'parent'], ['copied_from_recipe_id', 'copied_from'], ['branched_from_recipe_id', 'branched_from'],
+  ]) {
+    blocked.push(recipe({ [pointer]: 'ancestor', [name]: { id: 'ancestor', user_id: OTHER_USER } }));
+    blocked.push(recipe({ [pointer]: 'missing' }));
+    blocked.push(recipe({ [pointer]: 'ancestor', [name]: { id: 'ancestor' } }));
+  }
+  for (const original_recipes of [null, {}, { user_id: undefined }, { user_id: OTHER_USER }]) {
+    blocked.push(recipe({ original_recipe_id: 'original', original_recipes }));
+  }
+  blocked.push(recipe({ parent_recipe_id: 'parent', __lineage: new Map([
+    ['parent', { id: 'parent', user_id: KITCHEN_USER_ID, copied_from_recipe_id: 'foreign' }],
+    ['foreign', { id: 'foreign', user_id: OTHER_USER }],
+  ]) }));
+  blocked.push(recipe({ parent_recipe_id: ID, parent: recipe() })); // Cycle.
+  for (const username of ['will', 'kitchen']) blocked.push(recipe({ user_id: OTHER_USER, profiles: { username } }));
+  for (const row of blocked) {
+    assert.equal(recipeVisibility(row), 'unlisted');
+    assert.deepEqual(recipeSitemapRows([row], INDEXABLE_AUTHOR_IDS), []);
+    assert.equal(recipeVisibility(row) === 'indexable', false); // Cover route gate.
+  }
+  for (const user_id of [null, KITCHEN_USER_ID]) {
+    assert.equal(recipeVisibility(recipe({ original_recipe_id: 'original', original_recipes: { user_id } })), 'indexable');
+  }
+  assert.equal(sameAuthorLineage(recipe({ parent_recipe_id: 'own', parent_recipe: { id: 'own', user_id: KITCHEN_USER_ID } })), true);
+  assert.equal(sameAuthorLineage(recipe({ parent_recipe_id: 'own', __lineage: { own: { id: 'own', user_id: KITCHEN_USER_ID } } })), true);
+  const chain = Array.from({ length: 22 }, (_, i) => ({ id: String(i), user_id: KITCHEN_USER_ID, parent_recipe_id: i < 21 ? String(i + 1) : null }));
+  assert.equal(sameAuthorLineage(recipe({ parent_recipe_id: '0', __lineage: new Map(chain.map(r => [r.id, r])) })), false);
+});
+
+test('original media requires explicit null or same-author ownership; own image wins', () => {
+  for (const user_id of [undefined, OTHER_USER, null, KITCHEN_USER_ID]) {
+    const original_recipes = { user_id, original_recipe_media: [{ media_uri: 'original-image', media_type: 'image' }] };
+    assert.equal(recipeImageId(recipe({ recipe_media: [], original_recipes })),
+      user_id === null || user_id === KITCHEN_USER_ID ? 'original-image' : null);
+    assert.equal(recipeImageId(recipe({ original_recipes })), 'abc123-image');
+  }
+});
+
+test('club capture strips invite codes and referrer credentials, paths and queries', () => {
+  const body = buildCapture({ key: 'k', event: '$pageview', distinctId: 'mem-1',
+    href: 'https://www.biteclub.fun/club/123?invite=private-club-code',
+    referrer: 'https://user:password@www.google.com/search?q=secret#hash' });
+  assert.ok(body);
+  assert.equal(body.properties.$current_url, 'https://www.biteclub.fun/club/123');
+  assert.equal(body.properties.$referrer, 'https://www.google.com');
+  assert.equal(body.properties.$referring_domain, 'www.google.com');
+  const { api_key, ...capture } = body;
+  assert.doesNotMatch(JSON.stringify(capture), /invite=|private-club-code|password|secret/);
 });

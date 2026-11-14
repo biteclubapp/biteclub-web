@@ -1,3 +1,4 @@
+import type { RecipeRow } from './seo';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -18,6 +19,45 @@ function createServerClient() {
       persistSession: false,
     },
   });
+}
+
+// Ancestors deliberately exclude media. The anon client keeps RLS in effect.
+export const LINEAGE_SELECT = 'id,user_id,parent_recipe_id,copied_from_recipe_id,branched_from_recipe_id,original_recipe_id,original_recipes:original_recipe_id(user_id)';
+const LINEAGE_POINTERS = ['parent_recipe_id', 'copied_from_recipe_id', 'branched_from_recipe_id'] as const;
+
+export async function attachRecipeLineage(rows: RecipeRow[]): Promise<void> {
+  const catalog = new Map<string, RecipeRow>();
+  for (const row of rows) catalog.set(row.id, row);
+  for (const row of rows) {
+    for (const name of ['parent', 'copied_from', 'branched_from']) {
+      const nested = row[name] as RecipeRow | null | undefined;
+      if (nested?.id && !catalog.has(nested.id)) catalog.set(nested.id, nested);
+    }
+  }
+  const attempted = new Set<string>();
+  // Embedded nodes count as the first hop; the verifier enforces the exact per-root depth cap.
+  for (let depth = 0; depth < 20; depth++) {
+    const missing = new Set<string>();
+    for (const node of catalog.values()) {
+      for (const key of LINEAGE_POINTERS) {
+        const id = node[key];
+        if (typeof id === 'string' && id && !catalog.has(id) && !attempted.has(id)) missing.add(id);
+      }
+    }
+    if (!missing.size) break;
+    const ids = [...missing];
+    for (let offset = 0; offset < ids.length; offset += 200) {
+      const batch = ids.slice(offset, offset + 200);
+      batch.forEach(id => attempted.add(id));
+      try {
+        const { data, error } = await supabase.from('recipes').select(LINEAGE_SELECT).in('id', batch);
+        if (!error) for (const node of (data ?? []) as unknown as RecipeRow[]) catalog.set(node.id, node);
+      } catch {
+        // Missing ancestors remain absent, so visibility fails closed.
+      }
+    }
+  }
+  for (const row of rows) row.__lineage = catalog;
 }
 
 // Type for recipe data
@@ -45,6 +85,7 @@ export interface Recipe {
     media_type: string | null;
   }>;
   original_recipes?: {
+    user_id?: string | null;
     original_recipe_media?: Array<{
       media_uri: string;
       media_type: string | null;
@@ -63,6 +104,9 @@ export async function fetchRecipe(id: string): Promise<Recipe | null> {
     .from('recipes')
     .select(`
       *,
+      parent:parent_recipe_id (${LINEAGE_SELECT}),
+      copied_from:copied_from_recipe_id (${LINEAGE_SELECT}),
+      branched_from:branched_from_recipe_id (${LINEAGE_SELECT}),
       profiles!recipes_user_id_fkey (
         username,
         full_name,
@@ -73,6 +117,7 @@ export async function fetchRecipe(id: string): Promise<Recipe | null> {
         media_type
       ),
       original_recipes:original_recipe_id (
+        user_id,
         original_recipe_media (
           media_uri,
           media_type
@@ -86,7 +131,9 @@ export async function fetchRecipe(id: string): Promise<Recipe | null> {
     console.error('Recipe fetch failed:', error.code);
     return null;
   }
-  return (data as Recipe | null) ?? null;
+  const row = (data as Recipe | null) ?? null;
+  if (row) await attachRecipeLineage([row as RecipeRow]);
+  return row;
 }
 
 // Type for club data
