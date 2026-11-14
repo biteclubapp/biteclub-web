@@ -18,7 +18,7 @@ export default function StoreLink({ page = 'recipe', href, ct, shareId, placemen
     <a
       href={href}
       className={className}
-      onClick={() => capture('web:store_button_tapped', { page, ct, share_id: shareId, placement })}
+      onClick={() => capture('web:store_button_tapped', { page, ct, share_id: shareId, placement, event_version: 1 })}
     >
       {children}
     </a>
