@@ -342,7 +342,13 @@ test('lineage gates visibility, sitemap and cover for all ancestry paths', () =>
     ['parent', { id: 'parent', user_id: KITCHEN_USER_ID, copied_from_recipe_id: 'foreign' }],
     ['foreign', { id: 'foreign', user_id: OTHER_USER }],
   ]) }));
-  blocked.push(recipe({ parent_recipe_id: ID, parent: recipe() })); // Cycle.
+  assert.equal(recipeVisibility(recipe({ parent_recipe_id: ID })), 'indexable'); // Self-parent root is a terminal.
+  blocked.push(recipe({
+    parent_recipe_id: 'other',
+    __lineage: new Map([
+      ['other', { id: 'other', user_id: KITCHEN_USER_ID, parent_recipe_id: ID }],
+    ]),
+  })); // A → B → A is still a cycle.
   for (const username of ['will', 'kitchen']) blocked.push(recipe({ user_id: OTHER_USER, profiles: { username } }));
   for (const row of blocked) {
     assert.equal(recipeVisibility(row), 'unlisted');

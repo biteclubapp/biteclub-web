@@ -74,6 +74,9 @@ test('cover path uses anon RPC without privileged access or policy grants', asyn
   assert.doesNotMatch(helper, /console\./);
   const route = await readFile(new URL('../app/recipe/[id]/cover/route.ts', import.meta.url), 'utf8');
   assert.ok(route.indexOf("!== 'indexable'") < route.indexOf('await resolveRecipeImageId'));
+  const tomato = route.match(/Location: '\/tomato\.png', 'Cache-Control': '([^']+)'/);
+  assert.equal(tomato?.[1], 'public, max-age=300, s-maxage=300');
+  assert.match(route, /status: 200[\s\S]*s-maxage=3600/);
   const page = await readFile(new URL('../app/recipe/[id]/page.tsx', import.meta.url), 'utf8');
   assert.match(page, /visibility === 'indexable'\s*\? await resolveRecipeImageId\(recipe as RecipeRow\)\s*: recipeImageId/);
 });

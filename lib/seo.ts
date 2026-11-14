@@ -57,6 +57,8 @@ export function sameAuthorLineage(row: RecipeRow): boolean {
       const id = node[pointer];
       if (id == null) continue;
       if (typeof id !== 'string' || !id) return false;
+      // Self-parent is the create/import root convention (parent_recipe_id = id), a terminal not a cycle.
+      if (id === node.id) continue;
       const nested = (node[short] ?? node[long]) as RecipeRow | undefined;
       const ancestor = nested ?? (catalog instanceof Map ? catalog.get(id) : catalog?.[id]);
       if (!ancestor || ancestor.id !== id || !walk(ancestor, depth + 1)) return false;

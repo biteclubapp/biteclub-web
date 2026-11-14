@@ -28,7 +28,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     // Public recipe without a photo: the stable cover URL redirects to the placeholder.
     return new Response(null, {
       status: 302,
-      headers: { Location: '/tomato.png', 'Cache-Control': 'public, max-age=3600, s-maxage=3600' },
+      headers: { Location: '/tomato.png', 'Cache-Control': 'public, max-age=300, s-maxage=300' },
     });
   }
 
