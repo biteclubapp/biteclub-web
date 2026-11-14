@@ -57,7 +57,7 @@ export const isPickPath = (pathname: string): boolean => pathname === '/pick' ||
 /** Default ct for a page, by first path segment. */
 export function pageCt(pathname: string): string {
   const seg = pathname.split('/')[1] ?? '';
-  return ({ recipe: 'web_recipe', meal: 'web_meal', club: 'web_club' } as Record<string, string>)[seg] ?? 'web_home';
+  return ({ recipe: 'web_recipe', meal: 'web_meal', club: 'web_club', thanksgiving: 'web_thanksgiving' } as Record<string, string>)[seg] ?? 'web_home';
 }
 
 /** posthog-js semantics: hostname of the referrer, '$direct' when there is none. */

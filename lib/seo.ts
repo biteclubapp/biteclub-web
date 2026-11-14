@@ -166,6 +166,7 @@ export type SitemapRow = { url: string; lastModified?: Date; changeFrequency?: '
 export function staticSitemapRows(): SitemapRow[] {
   return [
     { url: siteUrl('/'), lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
+    { url: siteUrl('/thanksgiving'), changeFrequency: 'weekly', priority: 0.8 },
     { url: siteUrl('/terms'), lastModified: new Date('2025-08-18'), changeFrequency: 'yearly', priority: 0.3 },
     { url: siteUrl('/privacy'), lastModified: new Date('2025-08-18'), changeFrequency: 'yearly', priority: 0.3 },
   ];
@@ -194,4 +195,16 @@ export function recipeSitemapRows(rows: readonly RecipeRow[], authorIds: readonl
         priority: 0.7,
       };
     });
+}
+
+/** Exact-title @kitchen match only; drafts, private and soft-deleted rows cannot become menu links. */
+export function publishedKitchenRecipe(title: string, rows: readonly RecipeRow[]): RecipeRow | undefined {
+  return rows.find(row => row.title === title
+    && (row.user_id === KITCHEN_USER_ID || row.profiles?.username === 'kitchen')
+    && recipeVisibility(row) === 'indexable');
+}
+
+export function kitchenRecipeHref(title: string, rows: readonly RecipeRow[]): string | undefined {
+  const row = publishedKitchenRecipe(title, rows);
+  return row ? recipePath(row.id) : undefined;
 }

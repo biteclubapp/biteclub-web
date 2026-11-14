@@ -143,7 +143,7 @@ test('cover route gate: only indexable recipes are served (everything else 404s)
 
 test('sitemap: static pages on www, indexable recipes only, kitchen first, no /pick', () => {
   const statics = staticSitemapRows().map(r => r.url);
-  assert.deepEqual(statics, ['https://www.biteclub.fun/', 'https://www.biteclub.fun/terms', 'https://www.biteclub.fun/privacy']);
+  assert.deepEqual(statics, ['https://www.biteclub.fun/', 'https://www.biteclub.fun/thanksgiving', 'https://www.biteclub.fun/terms', 'https://www.biteclub.fun/privacy']);
 
   const OWNER = '11111111-1111-4111-8111-111111111111';
   const rows = recipeSitemapRows([
