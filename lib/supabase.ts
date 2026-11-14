@@ -1,4 +1,4 @@
-import type { RecipeRow } from './seo';
+import { needsRecipeLineage, type RecipeRow } from './seo';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -132,7 +132,8 @@ export async function fetchRecipe(id: string): Promise<Recipe | null> {
     return null;
   }
   const row = (data as Recipe | null) ?? null;
-  if (row) await attachRecipeLineage([row as RecipeRow]);
+  // Non-allowlisted authors are always unlisted (recipeVisibility never reads their lineage), so skip the walk.
+  if (row && needsRecipeLineage(row as RecipeRow)) await attachRecipeLineage([row as RecipeRow]);
   return row;
 }
 
