@@ -4,7 +4,8 @@
 // Only recipes lib/seo.ts recipeVisibility calls 'indexable' are served (not deleted, not private/draft, allowlisted
 // author); everything else is a 404 that does not reveal why.
 import { signImageUrl } from '@/lib/imageUrl';
-import { recipeImageId, recipeVisibility, type RecipeRow } from '@/lib/seo';
+import { resolveRecipeImageId } from '@/lib/coverImage';
+import { recipeVisibility, type RecipeRow } from '@/lib/seo';
 import { fetchRecipe } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -22,12 +23,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const recipe = await fetchRecipe(id);
   if (recipeVisibility(recipe as RecipeRow | null) !== 'indexable') return notFound();
 
-  const imageId = recipeImageId(recipe as RecipeRow);
+  const imageId = await resolveRecipeImageId(recipe as RecipeRow);
   if (!imageId) {
-    // Public recipe without a photo: the same stable fallback the schema uses.
+    // Public recipe without a photo: the stable cover URL redirects to the placeholder.
     return new Response(null, {
       status: 302,
-      headers: { Location: '/tomato.png', 'Cache-Control': 'public, max-age=3600, s-maxage=3600' },
+      headers: { Location: '/tomato.png', 'Cache-Control': 'public, max-age=300, s-maxage=300' },
     });
   }
 

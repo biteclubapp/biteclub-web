@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   FALLBACK_IMAGE_URL, KITCHEN_USER_ID, WILL_USER_ID, INDEXABLE_AUTHOR_IDS, sameAuthorLineage, SITE_ORIGIN, ingredientLines, instructionSteps, isImageId, isoDuration,
-  jsonLdScript, needsRecipeLineage, recipeCanonical, recipeCoverUrl, recipeImageId, recipeJsonLd, recipeSitemapRows, recipeVisibility,
+  jsonLdScript, needsRecipeLineage, recipeCanonical, recipeCoverUrl, recipeImageId, recipeJsonLd, recipeSchemaImage, recipeSitemapRows, recipeVisibility,
   siteUrl, staticSitemapRows, type RecipeRow,
 } from '../lib/seo.ts';
 import { buildCapture, campaignCt, isAllowedCt, referringDomain, sanitizeAnalyticsUrl, shareId } from '../lib/campaign.ts';
@@ -113,7 +113,7 @@ test('JSON-LD script escapes < so recipe text cannot close the tag', () => {
   assert.equal(JSON.parse(out).name, '</script><script>alert(1)</script>');
 });
 
-test('stable image URL: same-origin cover for public photos, tomato fallback, no unsafe ids', () => {
+test('stable image URL: same-origin cover even without a photo, no unsafe ids', () => {
   assert.equal(recipeCoverUrl(ID), `https://www.biteclub.fun/recipe/${ID}/cover`);
   assert.equal(recipeImageId(recipe()), 'abc123-image');
   // Falls back to the original recipe's media for copies; skips videos.
@@ -123,7 +123,8 @@ test('stable image URL: same-origin cover for public photos, tomato fallback, no
   })), 'orig-img');
   const noPhoto = recipe({ recipe_media: [] });
   assert.equal(recipeImageId(noPhoto), null);
-  assert.deepEqual(recipeJsonLd(noPhoto).image, [FALLBACK_IMAGE_URL]);
+  assert.deepEqual(recipeJsonLd(noPhoto).image, [recipeCoverUrl(ID)]);
+  assert.equal(recipeSchemaImage(noPhoto), recipeCoverUrl(ID));
   assert.equal(FALLBACK_IMAGE_URL, 'https://www.biteclub.fun/tomato.png');
   for (const bad of ['../secret', 'https://evil.example/x.png', 'a//b', '', '/abs', 'x?sig=1']) {
     assert.equal(isImageId(bad), false, bad);
@@ -357,7 +358,13 @@ test('lineage gates visibility, sitemap and cover for all ancestry paths', () =>
     ['parent', { id: 'parent', user_id: KITCHEN_USER_ID, copied_from_recipe_id: 'foreign' }],
     ['foreign', { id: 'foreign', user_id: OTHER_USER }],
   ]) }));
-  blocked.push(recipe({ parent_recipe_id: ID, parent: recipe() })); // Cycle.
+  assert.equal(recipeVisibility(recipe({ parent_recipe_id: ID })), 'indexable'); // Self-parent root is a terminal.
+  blocked.push(recipe({
+    parent_recipe_id: 'other',
+    __lineage: new Map([
+      ['other', { id: 'other', user_id: KITCHEN_USER_ID, parent_recipe_id: ID }],
+    ]),
+  })); // A → B → A is still a cycle.
   for (const username of ['will', 'kitchen']) blocked.push(recipe({ user_id: OTHER_USER, profiles: { username } }));
   for (const row of blocked) {
     assert.equal(recipeVisibility(row), 'unlisted');
@@ -393,7 +400,8 @@ test('link-only pages keep the original photo; indexable output keeps the same-a
   assert.equal(recipeImageId(copy, { sameAuthorMedia: true }), null);
   const foreignOriginal = recipe({ recipe_media: [], original_recipes: { ...original_recipes, user_id: OTHER_USER } });
   assert.equal(recipeImageId(foreignOriginal), null);
-  assert.deepEqual(recipeJsonLd(foreignOriginal).image, [FALLBACK_IMAGE_URL]);
+  // BIT-609: JSON-LD always points at the stable /cover route; that route uses the strict same-author resolver (no foreign original).
+  assert.deepEqual(recipeJsonLd(foreignOriginal).image, [recipeCoverUrl(foreignOriginal.id)]);
   // Videos are still skipped on link-only pages.
   assert.equal(recipeImageId(recipe({ user_id: OTHER_USER, recipe_media: [{ media_uri: 'vid', media_type: 'video' }] }), { sameAuthorMedia: false }), null);
 });

@@ -57,6 +57,8 @@ export function sameAuthorLineage(row: RecipeRow): boolean {
       const id = node[pointer];
       if (id == null) continue;
       if (typeof id !== 'string' || !id) return false;
+      // Self-parent is the create/import root convention (parent_recipe_id = id), a terminal not a cycle.
+      if (id === node.id) continue;
       const nested = (node[short] ?? node[long]) as RecipeRow | undefined;
       const ancestor = nested ?? (catalog instanceof Map ? catalog.get(id) : catalog?.[id]);
       if (!ancestor || ancestor.id !== id || !walk(ancestor, depth + 1)) return false;
@@ -105,6 +107,11 @@ export function isImageId(value: unknown): value is string {
     && !value.includes('//');
 }
 
+/** Accept only a successful cover RPC's path-safe image id. */
+export function acceptedCoverImageId(data: unknown, error: unknown): string | null {
+  return error != null || !isImageId(data) ? null : data;
+}
+
 /**
  * Own first image, else the original recipe's image. Videos are skipped. By default (indexable output: cover route,
  * JSON-LD, indexable page) the original's image counts only when its owner is explicitly null or the same author.
@@ -118,9 +125,9 @@ export function recipeImageId(row: RecipeRow, { sameAuthorMedia = true }: { same
   return first && isImageId(first.media_uri) ? first.media_uri : null;
 }
 
-/** Schema/OG image for an indexable recipe: the stable cover route, or the tomato when it has no photo. */
+/** Schema/OG image for an indexable recipe: the stable cover route, which resolves the current photo or placeholder. */
 export function recipeSchemaImage(row: RecipeRow): string {
-  return recipeImageId(row) ? recipeCoverUrl(row.id) : FALLBACK_IMAGE_URL;
+  return recipeCoverUrl(row.id);
 }
 
 /** Ingredient strings as displayed: JSON-ish `{"text": …}` items are unwrapped, blanks dropped. */
