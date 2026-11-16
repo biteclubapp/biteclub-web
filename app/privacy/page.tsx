@@ -99,7 +99,7 @@ export default function PrivacyPage() {
       examples: 'Error logs, crash details, app version',
       purpose: 'Debugging and reliability',
       required: 'Collected automatically',
-      retention: 'Short-term logs'
+      retention: 'Kept with analytics events (1 year)'
     }
   ]
 
@@ -383,7 +383,7 @@ export default function PrivacyPage() {
               <div className="space-y-3">
                 {[
                   'Your content and profile persist until you delete them or your account.',
-                  'Analytics events are kept for 1 year.',
+                  'Analytics events are kept for 1 year. Deleting your account does not immediately delete them; they expire after 1 year, or you can contact us to request deletion.',
                   'When you delete your account, we clear Decide preferences stored on your device. Logging out also clears Decide preferences on the device.',
                   'Push tokens are kept only while notifications are enabled.',
                   'Contacts matching works at query time; numbers aren\'t stored beyond the lookup.',

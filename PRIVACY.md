@@ -5,7 +5,9 @@ Last updated: November 16, 2026
 This Privacy Policy applies to BiteClub - Eat Together (the "App"), the consumer mobile app operated under the BiteClub brand. You can use some features, such as Decide, without creating an account. If you do not agree with this policy, please do not use the App.
 
 **✓ No Tracking.** We don't track you across apps or websites.
+
 **🔒 Your Data.** Contact info, content and social connections stay yours.
+
 **🚫 No Ads.** No third-party advertising or data selling.
 
 ## What We Collect
@@ -19,7 +21,7 @@ This Privacy Policy applies to BiteClub - Eat Together (the "App"), the consumer
 | Notifications | Expo push token, on-device reminder times | Push reminders and in-app notifications | Optional | While enabled; removed on disable |
 | Decide preferences | Recipes you swipe past, save, pick or cook, filters you choose, and optional "what do you cook / never show me" choices | Rank the meals Decide shows you | Optional (only if you use Decide) | On your device until you log out or delete your account; saves and posted cooks stay with your account until you delete them |
 | Product analytics | Screens viewed, features tapped, swipes and picks in Decide, posts, whether you opened the App from a notification, app version, device type, time zone. Also collected if you use the App as a guest. | Understand how the App is used, fix problems, improve features | Collected automatically; after you sign in, you can turn it off in Settings | 1 year |
-| Error and crash data | Error logs, crash details, app version | Debugging and reliability | Collected automatically | Short-term logs |
+| Error and crash data | Error logs, crash details, app version | Debugging and reliability | Collected automatically | Kept with analytics events (1 year) |
 
 We do not store your IP address in our analytics. We do not collect sensitive data such as precise location, health information, financial data or biometric information.
 
@@ -66,7 +68,7 @@ We may disclose information to comply with law, protect rights and safety, or as
 
 ## Retention and Deletion
 - Your content and profile persist until you delete them or your account.
-- Analytics events are kept for 1 year.
+- Analytics events are kept for 1 year. Deleting your account does not immediately delete them; they expire after 1 year, or you can contact us to request deletion.
 - When you delete your account, we clear Decide preferences stored on your device. Logging out also clears Decide preferences on the device.
 - Push tokens are kept only while notifications are enabled.
 - Contacts matching works at query time; numbers aren't stored beyond the lookup.
