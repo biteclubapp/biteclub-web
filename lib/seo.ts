@@ -213,7 +213,7 @@ export function staticSitemapRows(): SitemapRow[] {
     { url: siteUrl('/'), lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
     { url: siteUrl('/thanksgiving'), changeFrequency: 'weekly', priority: 0.8 },
     { url: siteUrl('/terms'), lastModified: new Date('2025-08-18'), changeFrequency: 'yearly', priority: 0.3 },
-    { url: siteUrl('/privacy'), lastModified: new Date('2025-08-18'), changeFrequency: 'yearly', priority: 0.3 },
+    { url: siteUrl('/privacy'), lastModified: new Date('2026-11-16'), changeFrequency: 'yearly', priority: 0.3 },
   ];
 }
 

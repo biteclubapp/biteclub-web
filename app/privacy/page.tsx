@@ -47,17 +47,24 @@ export default function PrivacyPage() {
   const dataTable = [
     {
       category: 'Account identifiers',
-      examples: 'Phone (for SMS sign-in), optional email, username, name, avatar URL',
+      examples: 'Phone (for SMS sign-in), Sign in with Apple or Google (name and email they share with us), optional email, username, name, avatar URL',
       purpose: 'Account creation, authentication, social features',
-      required: 'Phone or email required to sign in',
+      required: 'Required to create an account. Some features are available as a guest.',
       retention: 'Until account deletion'
     },
     {
       category: 'User content',
       examples: 'Photos, videos, captions, comments, likes, recipes, meals, collections',
-      purpose: 'Provide core social/journaling features',
+      purpose: 'Core social and journaling features',
       required: 'Optional but necessary to post',
-      retention: 'Until you delete content or your account'
+      retention: 'Until you delete it or your account'
+    },
+    {
+      category: 'Recipe import content',
+      examples: 'Links, text, photos or voice notes you choose to import',
+      purpose: 'Turn them into a recipe',
+      required: 'Optional',
+      retention: 'Processed at import time; the resulting recipe is kept as your content'
     },
     {
       category: 'Contacts matching',
@@ -69,16 +76,30 @@ export default function PrivacyPage() {
     {
       category: 'Notifications',
       examples: 'Expo push token, on-device reminder times',
-      purpose: 'Deliver push reminders and in-app notifications',
+      purpose: 'Push reminders and in-app notifications',
       required: 'Optional',
       retention: 'While enabled; removed on disable'
     },
     {
-      category: 'Usage & device data',
-      examples: 'App interactions, error logs; device type (iOS/Android)',
-      purpose: 'App functionality, performance, debugging',
+      category: 'Decide preferences',
+      examples: 'Recipes you swipe past, save, pick or cook, filters you choose, and optional "what do you cook / never show me" choices',
+      purpose: 'Rank the meals Decide shows you',
+      required: 'Optional (only if you use Decide)',
+      retention: 'On your device until you log out or delete your account; saves and posted cooks stay with your account until you delete them'
+    },
+    {
+      category: 'Product analytics',
+      examples: 'Screens viewed, features tapped, swipes and picks in Decide, posts, whether you opened the App from a notification, app version, device type, time zone. Also collected if you use the App as a guest.',
+      purpose: 'Understand how the App is used, fix problems, improve features',
+      required: 'Collected automatically; after you sign in, you can turn it off in Settings',
+      retention: '1 year'
+    },
+    {
+      category: 'Error and crash data',
+      examples: 'Error logs, crash details, app version',
+      purpose: 'Debugging and reliability',
       required: 'Collected automatically',
-      retention: 'Short-term logs'
+      retention: 'Kept with analytics events (1 year)'
     }
   ]
 
@@ -195,10 +216,10 @@ export default function PrivacyPage() {
                 Privacy First
               </div>
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">BiteClub - Eat Together Privacy Policy</h1>
-              <p className="text-xl text-gray-600">Last updated: August 18, 2025</p>
+              <p className="text-xl text-gray-600">Last updated: November 16, 2026</p>
               <div className="mt-6 p-6 bg-gradient-to-r from-orange-50 to-pink-50 rounded-2xl border border-orange-100">
                 <p className="text-gray-700">
-                  This Privacy Policy applies to <strong>BiteClub - Eat Together</strong> (the "App"), the public consumer mobile application operated under the BiteClub brand. If you do not agree with this policy, please do not use the App.
+                  This Privacy Policy applies to <strong>BiteClub - Eat Together</strong> (the "App"), the consumer mobile app operated under the BiteClub brand. You can use some features, such as Decide, without creating an account. If you do not agree with this policy, please do not use the App.
                 </p>
               </div>
             </div>
@@ -222,6 +243,11 @@ export default function PrivacyPage() {
                   <h3 className="font-semibold text-purple-900 mb-2">🚫 No Ads</h3>
                   <p className="text-purple-700 text-sm">No third-party advertising or data selling</p>
                 </div>
+              </div>
+              <div className="mt-6 space-y-2 text-gray-700 text-sm">
+                <p><strong>Data linked to you:</strong> Contact Info (phone, email, name), User Content (photos, posts, recipes, imported content, including audio if you import a voice note), Identifiers (user ID), Usage Data (product interaction), Contacts (only if you choose to find friends), Diagnostics.</p>
+                <p><strong>Purposes:</strong> App Functionality, Analytics, Product Personalization.</p>
+                <p><strong>Data used to track you:</strong> none.</p>
               </div>
             </section>
 
@@ -259,7 +285,7 @@ export default function PrivacyPage() {
 
               <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
                 <p className="text-blue-900 text-sm">
-                  <strong>Note:</strong> We do not collect sensitive data such as precise location, health information, financial data, or biometric information.
+                  <strong>Note:</strong> We do not store your IP address in our analytics. We do not collect sensitive data such as precise location, health information, financial data, or biometric information.
                 </p>
               </div>
 
@@ -270,8 +296,9 @@ export default function PrivacyPage() {
                   {[
                     { name: 'Camera', desc: 'To take photos of your meals' },
                     { name: 'Photos/Library', desc: 'To upload existing photos' },
-                    { name: 'Notifications', desc: 'To send cooking reminders' },
-                    { name: 'Contacts', desc: 'Optional - to find friends' }
+                    { name: 'Notifications', desc: 'To send cooking reminders and updates you care about, like a friend cooking your recipe' },
+                    { name: 'Contacts (optional)', desc: 'To find friends' },
+                    { name: 'Microphone (optional)', desc: 'Only if you import a recipe from a voice note' }
                   ].map((perm, i) => (
                     <div key={i} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
                       <div className="w-2 h-2 bg-orange-500 rounded-full mt-1.5" />
@@ -294,10 +321,13 @@ export default function PrivacyPage() {
               </h2>
               <div className="space-y-3">
                 {[
-                  'Provide and secure the App, authenticate users, and maintain your account',
+                  'Provide and secure the App, authenticate users and maintain your account',
                   'Enable social features (following, posting, commenting, liking)',
-                  'Deliver push notifications and daily reminders you configure',
-                  'Improve performance, debug issues, and protect against abuse'
+                  'Personalize Decide: we use your swipes, saves, picks and cooks to rank which meals Decide shows you, only within BiteClub',
+                  'Turn links, text, photos and voice notes you import into recipes, using AI service providers',
+                  'Deliver push notifications and reminders you configure',
+                  'Understand and improve the App with product analytics',
+                  'Improve performance, debug issues and protect against abuse, including automated checks of uploaded photos'
                 ].map((item, i) => (
                   <div key={i} className="flex items-start space-x-3">
                     <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-pink-600 rounded-full flex items-center justify-center mt-0.5">
@@ -309,7 +339,7 @@ export default function PrivacyPage() {
               </div>
               <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
                 <p className="text-green-900 font-medium">
-                  We do not sell your personal data and we do not use your data for third-party advertising or cross-app tracking.
+                  We do not sell your personal data, and we do not use your data for third-party advertising or cross-app tracking. Our AI providers process imported content only to return results to us.
                 </p>
               </div>
             </section>
@@ -324,10 +354,14 @@ export default function PrivacyPage() {
               <div className="space-y-3">
                 {[
                   { name: 'Supabase', desc: 'Authentication and database' },
+                  { name: 'Twilio (via Supabase Auth)', desc: 'Sending the SMS one-time passcode when you sign in with a phone number' },
+                  { name: 'Apple and Google', desc: 'Authentication if you choose Sign in with Apple or Google' },
                   { name: 'Cloudflare Images/Stream', desc: 'Media storage and delivery' },
-                  { name: 'Cloudflare Workers', desc: 'Media API and scheduled cleanup' },
+                  { name: 'Cloudflare Workers', desc: 'Media API, scheduled cleanup, and recipe-import processing' },
                   { name: 'Expo', desc: 'Push notification delivery' },
-                  { name: 'Sentry (Toucan)', desc: 'Error reporting (may include user ID for debugging)' }
+                  { name: 'PostHog (United States)', desc: 'Product analytics and error tracking' },
+                  { name: 'OpenRouter, with Google (Gemini) and OpenAI models', desc: 'Turning recipes you import into structured recipes, and recipe matching' },
+                  { name: 'OpenAI', desc: 'Automated safety checks of uploaded photos' }
                 ].map((service, i) => (
                   <div key={i} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <span className="font-semibold text-gray-900">{service.name}:</span>
@@ -348,11 +382,13 @@ export default function PrivacyPage() {
               </h2>
               <div className="space-y-3">
                 {[
-                  'Your content and profile persist until you delete them or delete your account',
-                  'Push tokens are retained only while notifications are enabled',
-                  'Contacts matching operates at query time; numbers are not stored beyond the lookup',
-                  'Backups and logs retain limited data for a short period for security and reliability',
-                  'When you delete your account, media deletions may take up to ~1 hour to propagate'
+                  'Your content and profile persist until you delete them or your account.',
+                  'Analytics events are kept for 1 year. Deleting your account does not immediately delete them; they expire after 1 year, or you can contact us to request deletion.',
+                  'When you delete your account, we clear Decide preferences stored on your device. Logging out also clears Decide preferences on the device.',
+                  'Push tokens are kept only while notifications are enabled.',
+                  'Contacts matching works at query time; numbers aren\'t stored beyond the lookup.',
+                  'Backups and logs keep limited data for a short period for security and reliability.',
+                  'When you delete your account, media deletions may take up to about 1 hour to propagate.'
                 ].map((item, i) => (
                   <div key={i} className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-500 rounded-full mt-2" />
@@ -369,9 +405,13 @@ export default function PrivacyPage() {
                 Your Choices and Rights
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
+                <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+                  <h3 className="font-semibold text-green-900 mb-2">Analytics</h3>
+                  <p className="text-green-700 text-sm">After you sign in, turn product analytics off in Settings. If you use the App as a guest, analytics may still be collected until you sign in and turn them off.</p>
+                </div>
                 <div className="p-4 bg-orange-50 rounded-xl border border-orange-200">
                   <h3 className="font-semibold text-orange-900 mb-2">Manage Notifications</h3>
-                  <p className="text-orange-700 text-sm">Control categories, reminder times, opt out anytime</p>
+                  <p className="text-orange-700 text-sm">Control categories, reminder times, or opt out any time</p>
                 </div>
                 <div className="p-4 bg-pink-50 rounded-xl border border-pink-200">
                   <h3 className="font-semibold text-pink-900 mb-2">Contact Discovery</h3>
