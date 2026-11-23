@@ -5,7 +5,7 @@ const YM = '20\\d{2}(?:0[1-9]|1[0-2])';
 const YMD = `${YM}(?:0[1-9]|[12]\\d|3[01])`;
 /** Same family as the app's ct values. Anything else falls back so a crafted link can't write into App Store Connect. */
 export const CT_RE = new RegExp(
-  `^(?:(?:tt|ig|x|yt|web|email|pin)_[a-z]{1,16}_${YMD}(?:_[ab])?|(?:tt|ig|x|yt|pin)_[a-z]{1,16}(?:_[ab])?|share_(?!decide_)[a-z]{1,16}_${YM}|share_decide_${YM}_[ab]|invite_[a-z]{1,16}_${YM}|web_(?:home|recipe|meal|club|pick|thanksgiving))$`,
+  `^(?:(?:tt|ig|x|yt|web|email|pin)_[a-z]{1,16}_${YMD}(?:_[ab])?|(?:tt|ig|x|yt|pin)_[a-z]{1,16}(?:_[ab])?|share_(?!decide_)[a-z]{1,16}_${YM}|share_decide_${YM}_[ab]|invite_[a-z]{1,16}_${YM}|web_(?:home|recipe|meal|club|pick|thanksgiving|whatsfordinner))$`,
 );
 
 export const isAllowedCt = (ct: unknown): ct is string => typeof ct === 'string' && ct.length <= 30 && CT_RE.test(ct);
@@ -60,7 +60,7 @@ export const isPickPath = (pathname: string): boolean => pathname === '/pick' ||
 /** Default ct for a page, by first path segment. */
 export function pageCt(pathname: string): string {
   const seg = pathname.split('/')[1] ?? '';
-  return ({ recipe: 'web_recipe', meal: 'web_meal', club: 'web_club', thanksgiving: 'web_thanksgiving' } as Record<string, string>)[seg] ?? 'web_home';
+  return ({ recipe: 'web_recipe', meal: 'web_meal', club: 'web_club', thanksgiving: 'web_thanksgiving', 'whats-for-dinner': 'web_whatsfordinner' } as Record<string, string>)[seg] ?? 'web_home';
 }
 
 /** posthog-js semantics: hostname of the referrer, '$direct' when there is none. */

@@ -3,7 +3,7 @@
 import { capture } from '@/lib/webAnalytics';
 
 type Props = {
-  page?: 'recipe' | 'thanksgiving';
+  page?: 'recipe' | 'thanksgiving' | 'whats_for_dinner';
   href: string;
   ct: string;
   shareId: string | null;

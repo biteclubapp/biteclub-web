@@ -332,6 +332,7 @@ export default function Page() {
             <div>
               <h4 className="font-semibold mb-4" style={{ color: '#3D352E' }}>Product</h4>
               <div className="space-y-2 text-gray-600 text-sm">
+                <p><a href="/whats-for-dinner">Dinner ideas</a></p>
                 <p>Features</p>
                 <p>How it Works</p>
                 <p>FAQ</p>
