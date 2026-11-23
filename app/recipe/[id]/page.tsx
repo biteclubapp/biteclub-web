@@ -342,8 +342,9 @@ export default async function RecipePage({
 
       {/* Footer */}
       <footer className="border-t border-gray-200 mt-16 px-6 py-6 bg-white mb-20">
-        <div className="max-w-4xl mx-auto text-center text-sm" style={{ color: '#3D352E', opacity: 0.5 }}>
-          <p>© 2024 BiteClub. All rights reserved.</p>
+        <div className="max-w-4xl mx-auto text-center text-sm">
+          <p className="mb-2"><a href="/whats-for-dinner" className="text-[#c71c39] font-semibold underline underline-offset-4">Dinner ideas</a></p>
+          <p style={{ color: '#3D352E', opacity: 0.5 }}>© 2024 BiteClub. All rights reserved.</p>
         </div>
       </footer>
     </div>

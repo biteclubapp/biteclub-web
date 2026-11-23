@@ -92,7 +92,7 @@ const jsonLd = {
       description:
         "The public social cooking app for home cooks. Build your cooking profile, share recipes, and track your journey as a home cook.",
       applicationCategory: "LifestyleApplication",
-      operatingSystem: "iOS, Android",
+      operatingSystem: "iOS",
       url: SITE_ORIGIN,
       downloadUrl: "https://apps.apple.com/app/id6748471652",
       offers: {
@@ -133,7 +133,7 @@ const jsonLd = {
           name: "Is BiteClub free?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Yes, BiteClub is free to download and use. It is available on iOS and Android.",
+            text: "Yes, BiteClub is free to download and use. It is available on iOS.",
           },
         },
         {
@@ -141,7 +141,7 @@ const jsonLd = {
           name: "How do I get started with BiteClub?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Download BiteClub from the App Store or Google Play, create your profile, and start logging what you cook. Every meal becomes part of your cooking identity. Share with friends, join clubs, and watch your cooking story grow.",
+            text: "Download BiteClub from the App Store, create your profile, and start logging what you cook. Every meal becomes part of your cooking identity. Share with friends, join clubs, and watch your cooking story grow.",
           },
         },
       ],
