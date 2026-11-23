@@ -103,10 +103,11 @@ test('store attribution defaults to web_whatsfordinner and the exact App Store U
   assert.equal(showInstallButton('Mozilla/5.0 (Linux; Android 14)'), false);
 });
 
-test('pinned pool has 15 dinners, 6 of them 30 min or less, and no invented ids in the fallback', () => {
-  assert.equal(pool.length, 15);
-  assert.equal(pool.filter(dish => dish.total_min <= 30).length, 6);
-  assert.equal(new Set(pool.map(dish => dish.id)).size, 15);
+test('pinned pool has 13 dinners with covers, 5 of them 30 min or less, and no invented ids in the fallback', () => {
+  assert.equal(pool.length, 13);
+  assert.equal(pool.filter(dish => dish.total_min <= 30).length, 5);
+  assert.equal(new Set(pool.map(dish => dish.id)).size, 13);
+  assert.ok(!pool.some(dish => dish.id === 'ff9e2d30-553d-4000-934a-0d398d6efb88' || dish.id === '93ca2064-17fc-486d-bf44-518b1716589f'));
   for (const dish of pool) {
     assert.match(dish.id, /^[0-9a-f-]{36}$/);
     assert.ok(dish.total_min > 0 && dish.servings > 0);
@@ -114,8 +115,8 @@ test('pinned pool has 15 dinners, 6 of them 30 min or less, and no invented ids 
     assert.equal(fallbackCard(dish).username, 'will');
   }
   const under30 = filterByTime(pool.map(dish => ({ ...fallbackCard(dish) })), '30');
-  assert.equal(under30.length, 6);
-  assert.equal(filterByTime(pool.map(dish => ({ ...fallbackCard(dish) })), 'any').length, 15);
+  assert.equal(under30.length, 5);
+  assert.equal(filterByTime(pool.map(dish => ({ ...fallbackCard(dish) })), 'any').length, 13);
 });
 
 test('resolveDinnerPool drops unpublished rows when the query succeeds and uses the pinned fallback on error', () => {
@@ -136,7 +137,7 @@ test('resolveDinnerPool drops unpublished rows when the query succeeds and uses 
   assert.equal(resolved[0].totalMin, 25);
   assert.equal(resolved[0].timeLabel, '25 min · serves 2');
   const fallback = resolveDinnerPool([], true);
-  assert.equal(fallback.length, 15);
+  assert.equal(fallback.length, 13);
   assert.equal(fallback[0].title, first.title);
   assert.equal(fallback[0].totalMin, first.total_min);
   assert.equal(recipeCanonical(first.id), `https://www.biteclub.fun/recipe/${first.id}`);
@@ -177,4 +178,27 @@ test('time filters stay visible when the 30-minute set is empty', () => {
   assert.match(src, /disabled=\{value === '30' && quick30\.length === 0\}/);
   assert.match(src, /\{current && <article/);
   assert.equal(filterByTime([{ totalMin: 45 }, { totalMin: 60 }], '30').length, 0);
+});
+
+test('Get BiteClub section sits under the picker, before the shortlist', () => {
+  const src = readFileSync(new URL('../app/whats-for-dinner/page.tsx', import.meta.url), 'utf8');
+  const app = src.indexOf('aria-labelledby="app-heading"');
+  const shortlist = src.indexOf('aria-labelledby="shortlist"');
+  const picker = src.indexOf('<DinnerPicker');
+  assert.ok(picker >= 0 && app > picker && shortlist > app);
+  assert.equal(src.split('aria-labelledby="app-heading"').length - 1, 1);
+});
+
+test('Android header store slot is empty and the already-have line is hidden', () => {
+  const src = readFileSync(new URL('../app/whats-for-dinner/WfdStoreLink.tsx', import.meta.url), 'utf8');
+  assert.match(src, /placement === 'header'\) return null/);
+  assert.match(src, /already \? <p/);
+});
+
+test('picker has a single Cook this recipe link and decorative cover alt', () => {
+  const src = readFileSync(new URL('../app/whats-for-dinner/DinnerPicker.tsx', import.meta.url), 'utf8');
+  assert.equal(src.split('href={current.href}').length - 1, 1);
+  assert.match(src, /alt=""/);
+  assert.match(src, /focusRing/);
+  assert.match(src, /CoverImage/);
 });

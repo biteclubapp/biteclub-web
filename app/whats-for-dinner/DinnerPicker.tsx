@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { capture } from '@/lib/webAnalytics';
 import { recipeCoverUrl } from '@/lib/seo';
+import CoverImage from './CoverImage';
 import {
   WFD_ANOTHER,
   WFD_COOK_THIS,
@@ -88,28 +89,23 @@ export default function DinnerPicker({ recipes, initialIndex }: { recipes: Dinne
         ))}
       </div>
       {current && <article className="rounded-2xl border border-stone-200 overflow-hidden max-w-xl">
-        <a
-          href={current.href}
-          className="block hover:bg-stone-50"
-          onClick={() => track('open_recipe', current, filter, index + 1, 'picker')}
-        >
-          <div className="aspect-[4/3] bg-stone-100 overflow-hidden">
-            <img
-              src={recipeCoverUrl(current.id)}
-              alt={current.title}
-              width={1200}
-              height={900}
-              className="w-full h-full object-cover"
-              loading="eager"
-              fetchPriority="high"
-            />
-          </div>
-          <div className="p-4 pb-0">
-            <h2 className="font-bold text-2xl leading-snug mb-2">{current.title}</h2>
-            <p className="text-sm text-stone-600 mb-1">{current.timeLabel}</p>
-            <p className="text-sm text-stone-600">by @{current.username}</p>
-          </div>
-        </a>
+        <div className="aspect-[4/3] bg-stone-100 overflow-hidden">
+          <CoverImage
+            key={current.id}
+            src={recipeCoverUrl(current.id)}
+            alt=""
+            width={1200}
+            height={900}
+            className="w-full h-full object-cover"
+            loading="eager"
+            fetchPriority="high"
+          />
+        </div>
+        <div className="p-4 pb-0">
+          <h2 className="font-bold text-2xl leading-snug mb-2">{current.title}</h2>
+          <p className="text-sm text-stone-600 mb-1">{current.timeLabel}</p>
+          <p className="text-sm text-stone-600">by @{current.username}</p>
+        </div>
         <div className="p-4 flex flex-wrap items-center gap-3">
           <a
             href={current.href}

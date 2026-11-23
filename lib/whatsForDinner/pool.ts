@@ -38,11 +38,10 @@ export const WFD_FAQ = [
 ] as const;
 export const WFD_BANNER = 'app-id=6748471652, affiliate-data=pt=127915368&ct=web_whatsfordinner';
 
-/** Pinned 15 public dinners by @will, checked 2026-11-23. IDs are stable; titles/times are the fallback. */
+/** Pinned public dinners by @will. Beef Lettuce Wraps and Chicken Shawarma Bowls were dropped 2026-11-23 until they have real covers (Designer review). IDs are stable; titles/times are the fallback. */
 export const pool = [
   { id: '33785ed3-55fd-414c-ae86-f63ed80d7eb5', title: 'Salmon Bowl', total_min: 20, servings: 1 },
   { id: '06c7d824-9857-4015-9f87-47a42c432939', title: 'Smash Tacos', total_min: 25, servings: 4 },
-  { id: 'ff9e2d30-553d-4000-934a-0d398d6efb88', title: 'Beef Lettuce Wraps', total_min: 25, servings: 4 },
   { id: '706b54b6-e992-474c-a7b9-5b3af61769a5', title: 'Honey Garlic Chicken & Benihana Fried Rice', total_min: 30, servings: 4 },
   { id: '54078dc2-49b3-4221-85be-2550a0841e66', title: 'Homemade Pizza', total_min: 30, servings: 4 },
   { id: '4d5b48a5-49aa-4f8e-b0c4-00090ac8d142', title: 'Chicken Caesar Salad', total_min: 30, servings: 2 },
@@ -53,7 +52,6 @@ export const pool = [
   { id: 'e217669c-742f-4204-a75f-91a28a1ab3cb', title: 'Grilled Steak with Zucchini and Crinkle-Cut Potatoes', total_min: 40, servings: 2 },
   { id: '6de21160-32bc-440b-a0ed-6d3a98018f48', title: 'Beef Bowl', total_min: 45, servings: 4 },
   { id: '9b857f50-f541-4bea-9098-cbe0aeb924ab', title: 'Creole Jambalaya', total_min: 60, servings: 4 },
-  { id: '93ca2064-17fc-486d-bf44-518b1716589f', title: 'Chicken Shawarma Bowls', total_min: 60, servings: 4 },
   { id: '1a964fc4-5c6a-4e10-8dcf-8480e0c37792', title: 'Chicken Parmesan', total_min: 60, servings: 4 },
 ] as const;
 

@@ -11,10 +11,12 @@ export default function WfdStoreLink({
   placement,
   className,
   children,
+  already,
 }: {
   placement: 'header' | 'inline';
   className?: string;
   children: React.ReactNode;
+  already?: string;
 }) {
   const [ct, setCt] = useState(WFD_CT);
   const [sid, setSid] = useState<string | null>(null);
@@ -27,18 +29,25 @@ export default function WfdStoreLink({
     setVisible(showInstallButton(navigator.userAgent));
   }, []);
 
-  if (!visible) return <p className="text-sm text-stone-600">{WFD_ANDROID_NOTE}</p>;
+  if (!visible) {
+    // Header: render nothing so the Android note cannot wrap over the wordmark.
+    if (placement === 'header') return null;
+    return <p className="text-sm text-stone-600">{WFD_ANDROID_NOTE}</p>;
+  }
 
   return (
-    <StoreLink
-      page={WFD_PAGE}
-      href={storeUrl(ct)}
-      ct={ct}
-      shareId={sid}
-      placement={placement}
-      className={className}
-    >
-      {children}
-    </StoreLink>
+    <>
+      <StoreLink
+        page={WFD_PAGE}
+        href={storeUrl(ct)}
+        ct={ct}
+        shareId={sid}
+        placement={placement}
+        className={className}
+      >
+        {children}
+      </StoreLink>
+      {already ? <p className="mt-4 text-sm text-stone-600">{already}</p> : null}
+    </>
   );
 }

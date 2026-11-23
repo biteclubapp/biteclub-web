@@ -25,6 +25,7 @@ import type { DinnerCard } from '@/lib/whatsForDinner/resolve';
 import DinnerPicker from './DinnerPicker';
 import WfdStoreLink from './WfdStoreLink';
 import GridRecipeLink from './GridRecipeLink';
+import CoverImage from './CoverImage';
 
 export const revalidate = 3600;
 
@@ -97,6 +98,11 @@ export default async function WhatsForDinnerPage() {
         <p className="text-lg leading-relaxed max-w-2xl mb-8">{WFD_LEDE}</p>
         {recipes.length > 0 && <DinnerPicker recipes={recipes} initialIndex={initialIndex} />}
       </section>
+      <section className="rounded-2xl bg-stone-50 p-6 sm:p-8 mb-12" aria-labelledby="app-heading">
+        <h2 id="app-heading" className="text-2xl font-bold mb-3">{WFD_APP_H2}</h2>
+        <p className="mb-5 leading-relaxed">{copy.body}</p>
+        <WfdStoreLink placement="inline" className={button} already={WFD_APP_ALREADY}>{copy.button}</WfdStoreLink>
+      </section>
       {recipes.length > 0 && (
         <section className="mb-12" aria-labelledby="shortlist">
           <h2 id="shortlist" className="text-2xl font-bold mb-5">{WFD_SHORTLIST_H2}</h2>
@@ -105,7 +111,8 @@ export default async function WhatsForDinnerPage() {
               <article key={card.id} className="rounded-2xl border border-stone-200 overflow-hidden">
                 <GridRecipeLink card={card} position={i + 1} className={`block h-full hover:bg-stone-50 ${focusRing}`}>
                   <div className="aspect-[4/3] bg-stone-100 overflow-hidden">
-                    <img
+                    <CoverImage
+                      key={card.id}
                       src={recipeCoverUrl(card.id)}
                       alt={card.title}
                       width={800}
@@ -129,12 +136,6 @@ export default async function WhatsForDinnerPage() {
         <ol className="list-decimal pl-5 space-y-3 leading-relaxed">
           {WFD_EXPLAINER_STEPS.map(step => <li key={step}>{step}</li>)}
         </ol>
-      </section>
-      <section className="rounded-2xl bg-stone-50 p-6 sm:p-8 mb-12" aria-labelledby="app-heading">
-        <h2 id="app-heading" className="text-2xl font-bold mb-3">{WFD_APP_H2}</h2>
-        <p className="mb-5 leading-relaxed">{copy.body}</p>
-        <WfdStoreLink placement="inline" className={button}>{copy.button}</WfdStoreLink>
-        <p className="mt-4 text-sm text-stone-600">{WFD_APP_ALREADY}</p>
       </section>
       <section className="mb-4 max-w-2xl" aria-labelledby="faq">
         <h2 id="faq" className="sr-only">FAQ</h2>

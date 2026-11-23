@@ -81,7 +81,7 @@ export default async function ThanksgivingPage({ searchParams }: { searchParams:
         <h2 id="app-heading" className="text-2xl font-bold mb-3">Cook with BiteClub</h2>
         <p className="mb-5 leading-relaxed">Cook these recipes in BiteClub as they go live, or swipe in Decide to pick tonight’s meal.</p>
         <StoreLink {...attribution} placement="inline" className={button}>Open in BiteClub</StoreLink>
-        <p className="mt-6 leading-relaxed"><a href="/whats-for-dinner">For the other nights: what's for dinner tonight →</a></p>
+        <p className="mt-6 leading-relaxed"><a href="/whats-for-dinner" className="text-[#c71c39] font-semibold underline underline-offset-4">For the other nights: what’s for dinner tonight →</a></p>
       </section>
     </main>
     <footer className="border-t p-6 text-center text-sm text-stone-600"><a href="/">BiteClub</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></footer>
