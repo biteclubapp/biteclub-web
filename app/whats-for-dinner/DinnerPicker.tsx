@@ -33,6 +33,7 @@ const focusRing = 'focus-visible:outline focus-visible:outline-2 focus-visible:o
 export default function DinnerPicker({ recipes, initialIndex }: { recipes: DinnerCard[]; initialIndex: number }) {
   const [filter, setFilter] = useState<TimeFilter>('any');
   const filtered = filterByTime(recipes, filter);
+  const quick30 = filterByTime(recipes, '30');
   const safeIndex = filtered.length ? Math.min(indexOrStart(initialIndex, filtered.length, filter), filtered.length - 1) : 0;
   const [index, setIndex] = useState(safeIndex);
   const [remaining, setRemaining] = useState<number[]>([]);
@@ -42,6 +43,7 @@ export default function DinnerPicker({ recipes, initialIndex }: { recipes: Dinne
   function applyFilter(next: TimeFilter) {
     if (next === filter) return;
     const list = filterByTime(recipes, next);
+    if (next !== 'any' && list.length === 0) return;
     const currentId = current?.id;
     const kept = currentId ? list.findIndex(card => card.id === currentId) : -1;
     const nextIndex = kept >= 0 ? kept : defaultPickIndex(list.length);
@@ -62,8 +64,6 @@ export default function DinnerPicker({ recipes, initialIndex }: { recipes: Dinne
     anotherRef.current?.focus();
   }
 
-  if (!current) return null;
-
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-5" role="group" aria-label="Time filter">
@@ -75,16 +75,19 @@ export default function DinnerPicker({ recipes, initialIndex }: { recipes: Dinne
             key={value}
             type="button"
             aria-pressed={filter === value}
+            disabled={value === '30' && quick30.length === 0}
             onClick={() => applyFilter(value)}
             className={`min-h-11 px-4 rounded-full font-semibold border ${focusRing} ${
-              filter === value ? 'bg-[#c71c39] text-white border-[#c71c39]' : 'bg-white text-[#3D352E] border-stone-300'
+              value === '30' && quick30.length === 0
+                ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed'
+                : filter === value ? 'bg-[#c71c39] text-white border-[#c71c39]' : 'bg-white text-[#3D352E] border-stone-300'
             }`}
           >
             {label}
           </button>
         ))}
       </div>
-      <article className="rounded-2xl border border-stone-200 overflow-hidden max-w-xl">
+      {current && <article className="rounded-2xl border border-stone-200 overflow-hidden max-w-xl">
         <a
           href={current.href}
           className="block hover:bg-stone-50"
@@ -126,7 +129,7 @@ export default function DinnerPicker({ recipes, initialIndex }: { recipes: Dinne
         </div>
         <p aria-live="polite" className="sr-only">{announcePick(current.title, current.totalMin)}</p>
         <p className="px-4 pb-5 text-sm text-stone-600">{WFD_NO_SIGNUP}</p>
-      </article>
+      </article>}
     </div>
   );
 }

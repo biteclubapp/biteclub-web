@@ -170,3 +170,11 @@ test('root JSON-LD no longer claims Android or Google Play', () => {
   assert.match(src, /operatingSystem: "iOS"/);
   assert.doesNotMatch(src, /iOS, Android|iOS and Android|Google Play/);
 });
+
+test('time filters stay visible when the 30-minute set is empty', () => {
+  const src = readFileSync(new URL('../app/whats-for-dinner/DinnerPicker.tsx', import.meta.url), 'utf8');
+  assert.doesNotMatch(src, /if \(!current\) return null;/);
+  assert.match(src, /disabled=\{value === '30' && quick30\.length === 0\}/);
+  assert.match(src, /\{current && <article/);
+  assert.equal(filterByTime([{ totalMin: 45 }, { totalMin: 60 }], '30').length, 0);
+});
