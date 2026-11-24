@@ -54,5 +54,5 @@ export default function CoverImage({
     if (img.complete && img.naturalWidth === 0) applyFallback(img);
   }, [src]);
 
-  return <span ref={wrapRef} dangerouslySetInnerHTML={{ __html: html }} />;
+  return <span ref={wrapRef} className="contents" dangerouslySetInnerHTML={{ __html: html }} />;
 }
