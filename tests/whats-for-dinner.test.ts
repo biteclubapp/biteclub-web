@@ -211,4 +211,5 @@ test('CoverImage falls back without a hydration gap and checks failed first pain
   assert.match(src, /img\.complete && img\.naturalWidth === 0/);
   assert.match(src, /FALLBACK_IMAGE_URL/);
   assert.match(src, /dangerouslySetInnerHTML/);
+  assert.match(src, /className="contents"/);
 });
