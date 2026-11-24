@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
+  WFD_APP_ALREADY,
   WFD_APP_COPY,
   WFD_BANNER,
   WFD_CT,
@@ -48,6 +49,8 @@ test('route, exact copy, www canonical and sitemap inclusion preserve pick exclu
   assert.equal(WFD_OG_TITLE, "What's for dinner tonight?");
   assert.equal(WFD_OG_DESCRIPTION, 'Tap once for a real home-cooked dinner with photos and steps. Not feeling it? Skip to the next.');
   assert.equal(WFD_APP_COPY, 'A');
+  assert.equal(WFD_APP_ALREADY, 'Already have BiteClub? Open a recipe and tap Open in BiteClub.');
+  assert.doesNotMatch(WFD_APP_ALREADY, /above/);
   assert.deepEqual(appCopy(), {
     body: 'BiteClub is an iPhone app for home cooks. Save recipes like these, cook them, and share what you made with friends.',
     button: 'Get BiteClub on the App Store',
