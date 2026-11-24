@@ -205,3 +205,10 @@ test('picker has a single Cook this recipe link and decorative cover alt', () =>
   assert.match(src, /focusRing/);
   assert.match(src, /CoverImage/);
 });
+test('CoverImage falls back without a hydration gap and checks failed first paint on mount', () => {
+  const src = readFileSync(new URL('../app/whats-for-dinner/CoverImage.tsx', import.meta.url), 'utf8');
+  assert.match(src, /onerror=/);
+  assert.match(src, /img\.complete && img\.naturalWidth === 0/);
+  assert.match(src, /FALLBACK_IMAGE_URL/);
+  assert.match(src, /dangerouslySetInnerHTML/);
+});
