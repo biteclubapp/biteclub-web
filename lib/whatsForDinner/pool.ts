@@ -30,7 +30,7 @@ export const WFD_APP_BODY_A = 'BiteClub is an iPhone app for home cooks. Save re
 export const WFD_APP_BUTTON_A = 'Get BiteClub on the App Store';
 export const WFD_APP_BODY_B = "Never ask what's for dinner again. Open BiteClub and swipe through dinner ideas, one card at a time. Browse and pick without an account.";
 export const WFD_APP_BUTTON_B = 'Get the app';
-export const WFD_APP_ALREADY = 'Already have BiteClub? Open any recipe above and tap Open in BiteClub.';
+export const WFD_APP_ALREADY = 'Already have BiteClub? Open a recipe and tap Open in BiteClub.';
 export const WFD_ANDROID_NOTE = 'BiteClub is on iPhone for now.';
 export const WFD_FAQ = [
   { q: 'Do I need an account?', a: 'No. The picker and recipe pages are free to use on the web, and nothing you pick is saved.' },

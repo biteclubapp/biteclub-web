@@ -428,3 +428,33 @@ test('club capture strips invite codes and referrer credentials, paths and queri
   const { api_key, ...capture } = body;
   assert.doesNotMatch(JSON.stringify(capture), /invite=|private-club-code|password|secret/);
 });
+
+test('PostHog public env is read as a static member, never through a process polyfill import', async () => {
+  const { readdir, readFile } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+  const files: string[] = [];
+  async function walk(dir: string) {
+    for (const ent of await readdir(dir, { withFileTypes: true })) {
+      const p = join(dir, ent.name);
+      if (ent.isDirectory()) await walk(p);
+      else if (/\.(ts|tsx|js|mjs|cjs)$/.test(ent.name)) files.push(p);
+    }
+  }
+  for (const root of ['app', 'lib']) await walk(new URL(`../${root}`, import.meta.url).pathname);
+
+  const polyfill = /import\s+(?:type\s+)?(?:process\b|\*\s+as\s+process)\s+from\s*['"](?:node:)?process(?:\/browser)?['"]|require\(\s*['"](?:node:)?process(?:\/browser)?['"]\s*\)/;
+  const computed = /process\.env\s*\[\s*['"]NEXT_PUBLIC_POSTHOG_(?:KEY|HOST)['"]\s*\]/;
+  const destructure = /(?:const|let|var)\s+\{[^}]*NEXT_PUBLIC_POSTHOG_(?:KEY|HOST)[^}]*\}\s*=\s*process\.env/;
+  let keyReads = 0;
+  let hostReads = 0;
+  for (const f of files) {
+    const src = await readFile(f, 'utf8');
+    assert.doesNotMatch(src, polyfill, `${f} must not import the Node process polyfill`);
+    assert.doesNotMatch(src, computed, `${f} must not use computed PostHog env access`);
+    assert.doesNotMatch(src, destructure, `${f} must not destructure PostHog env`);
+    keyReads += (src.match(/process\.env\.NEXT_PUBLIC_POSTHOG_KEY/g) || []).length;
+    hostReads += (src.match(/process\.env\.NEXT_PUBLIC_POSTHOG_HOST/g) || []).length;
+  }
+  assert.ok(keyReads >= 2, 'web and pick capture must both read NEXT_PUBLIC_POSTHOG_KEY as a literal member');
+  assert.ok(hostReads >= 2, 'web and pick capture must both read NEXT_PUBLIC_POSTHOG_HOST as a literal member');
+});

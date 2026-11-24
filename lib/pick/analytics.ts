@@ -1,6 +1,7 @@
 // Minimal PostHog capture for the pick page (BIT-378): no posthog-js dependency, sent after first paint.
 // No PII: an anonymous per-browser id, never the share token, voter id, names or titles.
 // No-op unless NEXT_PUBLIC_POSTHOG_KEY is set.
+// Same inlining rule as lib/webAnalytics.ts: literal process.env.NEXT_PUBLIC_* only, no Node process package import.
 const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const HOST = (process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com').replace(/\/+$/, '');
 const ANON_KEY = 'bc:anon_id:v1';

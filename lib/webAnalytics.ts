@@ -2,6 +2,9 @@
 // The distinct id lives only in this module (one per tab, gone on reload): no cookies, no localStorage, no identify.
 import { buildCapture } from '@/lib/campaign';
 
+// Next inlines only a literal `process.env.NEXT_PUBLIC_*` member access into the client bundle.
+// Do not import the Node 'process' package, or read through a destructured/computed env: the webpack
+// process polyfill ships `{ env: {} }`, KEY is empty, and capture returns early.
 const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const HOST = (process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com').replace(/\/+$/, '');
 
